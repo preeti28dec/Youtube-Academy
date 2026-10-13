@@ -136,6 +136,39 @@ Razorpay dashboard mein set karein:
 
 ---
 
+## Docker
+
+App + PostgreSQL ek command mein:
+
+```bash
+cp .env.docker.example .env.docker    # secrets bharein
+npm run docker:up                     # build + start (background)
+npm run docker:logs                   # logs dekhein
+npm run docker:down                   # band karein
+```
+
+Pehli baar demo data chahiye to `.env.docker` mein `SEED_ON_START="true"` kar dein.
+App `http://localhost:3000` par aayega.
+
+Kaise bana hai:
+
+- **Dockerfile** ke chaar stage — `deps` (npm ci), `builder` (prisma generate + next build),
+  `migrator` (builder par bana, poore node_modules ke saath taaki prisma CLI chale),
+  `runner` (sirf standalone output, chhota image).
+- **Provider switch:** build ke andar `scripts/switch-db.mjs postgresql --musl` chalta hai,
+  isliye repo ka `schema.prisma` local dev ke liye sqlite par hi rehta hai. Manually
+  badalna ho to `npm run db:use-postgres` / `npm run db:use-sqlite`.
+- **`media/` named volume par hai** — warna container restart par uploaded videos chali jaati.
+- **`.gitattributes` sab kuch LF rakhta hai** — CRLF wala `.sh` container mein
+  `/bin/sh^M: bad interpreter` deta hai.
+- `output: "standalone"` sirf `DOCKER_BUILD=1` par on hota hai, taaki Vercel par asar na ho.
+
+## Vercel
+
+Vercel par deploy karne se pehle [VERCEL.md](./VERCEL.md) padhein — **SQLite aur local video
+streaming wahan kaam nahi karte** (serverless par persistent disk hota hi nahi). Postgres aur
+external video host zaroori hain.
+
 ## Production checklist
 
 - [ ] `prisma/schema.prisma` mein provider `postgresql` karein, `DATABASE_URL` badlein ([DATABASE.md](./DATABASE.md))
