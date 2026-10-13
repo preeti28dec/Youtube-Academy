@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getCourse } from "@/lib/course";
 import { rupees } from "@/lib/format";
 import { SyllabusAccordion } from "@/components/SyllabusAccordion";
@@ -18,7 +18,7 @@ export const metadata = { title: "Course Details · Sohail YouTube Academy" };
 
 export default async function CoursePage() {
   const course = await getCourse();
-  if (!course) notFound();
+  if (!course) redirect("/setup");
 
   const price = rupees(course.pricePaise);
   const includes = [

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { getCourse } from "@/lib/course";
 import { rupees } from "@/lib/format";
 import { CheckIcon, LockIcon, PlayIcon } from "@/components/icons";
@@ -33,7 +33,8 @@ const BENEFITS = [
 
 export default async function HomePage() {
   const course = await getCourse();
-  if (!course) notFound();
+  // Fresh database — abhi content bana hi nahi. 404 ke bajaye setup par bhejein.
+  if (!course) redirect("/setup");
 
   const price = rupees(course.pricePaise);
   const includes = [

@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { dbConfigProblem, describeDbUrl, resolveDbUrl } from "@/lib/db-url";
 import { secretsConfigured } from "@/lib/env";
+import { prisma } from "@/lib/prisma";
 import { CheckIcon } from "@/components/icons";
+import { BootstrapForm } from "./BootstrapForm";
 
 export const metadata = { title: "Setup zaroori hai · Sohail YouTube Academy" };
 
@@ -30,10 +33,69 @@ const ENV_VARS = [
   },
 ];
 
-export default function SetupPage() {
+export default async function SetupPage() {
   const problem = dbConfigProblem();
   const resolved = resolveDbUrl();
   const secretsOk = secretsConfigured();
+
+  // Env theek hai to aage ka sawaal yeh hai: database mein content hai ya nahi.
+  let dbEmpty: boolean | null = null;
+  if (!problem && secretsOk) {
+    try {
+      const [users, courses] = await Promise.all([prisma.user.count(), prisma.course.count()]);
+      dbEmpty = users === 0 && courses === 0;
+    } catch {
+      dbEmpty = null; // connect hi nahi hua — neeche env wali list dikh jayegi
+    }
+  }
+
+  // Sab taiyaar hai — yahan rukne ki zaroorat nahi.
+  if (!problem && secretsOk && dbEmpty === false) {
+    return (
+      <div className="mx-auto w-full max-w-[560px] px-5 pt-14 pb-20">
+        <div className="flex flex-col items-center gap-4 rounded-[18px] border border-line bg-surface p-[clamp(24px,5vw,40px)] text-center shadow-[0_4px_16px_rgba(20,24,33,.06)]">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ok-soft text-ok">
+            <CheckIcon size={26} strokeWidth={2.6} />
+          </span>
+          <h1 className="text-[24px] font-extrabold tracking-[-0.02em] text-ink">
+            Setup pura ho chuka hai
+          </h1>
+          <p className="text-[15px] leading-relaxed text-body">
+            Database jud gaya hai aur course ka content maujood hai.
+          </p>
+          <Link
+            href="/"
+            className="w-full rounded-xl bg-brand px-5 py-3.5 text-[15px] font-bold text-white hover:bg-brand-dark"
+          >
+            Site kholein
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Env theek, par database khaali — shuruaati content banana hai.
+  if (!problem && secretsOk && dbEmpty === true) {
+    return (
+      <div className="mx-auto w-full max-w-[640px] px-5 pt-12 pb-20">
+        <div className="flex flex-col gap-5 rounded-[18px] border border-line bg-surface p-[clamp(24px,5vw,40px)] shadow-[0_4px_16px_rgba(20,24,33,.06)]">
+          <div className="flex flex-col gap-2">
+            <span className="text-[11px] font-semibold tracking-[0.09em] uppercase text-faint">
+              Aakhri step
+            </span>
+            <h1 className="text-[clamp(24px,4vw,30px)] font-extrabold leading-tight tracking-[-0.02em] text-ink">
+              Database taiyaar hai — ab course ka content banayein
+            </h1>
+            <p className="text-[15px] leading-relaxed text-body">
+              Neeche se shuruaati syllabus (6 modules, 20 lessons) aur aapka admin account bann
+              jayega. Uske baad /admin se jo chahein badal sakte hain, aur videos jod sakte hain.
+            </p>
+          </div>
+          <BootstrapForm />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto w-full max-w-[720px] px-5 pt-12 pb-20">
