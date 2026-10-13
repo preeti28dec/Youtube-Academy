@@ -119,6 +119,8 @@
     <div><span class="k">Stack</span><span class="v">Next.js 15 · Node.js · PostgreSQL</span></div>
     <div><span class="k">Hosting</span><span class="v">Vercel + Neon Postgres</span></div>
     <div><span class="k">Repository</span><span class="v mono">github.com/preeti28dec/Youtube-Academy</span></div>
+    <div><span class="k">Live site</span><span class="v mono">youtube-academy-git-main-preeti28decs-projects.vercel.app</span></div>
+    <div><span class="k">Language</span><span class="v">English (Hindi baad mein jod sakte hain)</span></div>
     <div><span class="k">Document date</span><span class="v">13 October 2026</span></div>
   </div>
 </section>
@@ -152,6 +154,16 @@
         Jisne paise nahi diye, woh video nahi dekh sakta — chahe usko link hi kyun na
         mil jaaye. Yeh is project ki sabse zaroori requirement thi, aur poora system
         isi ke aas-paas bana hai. Detail Section 6 mein hai.
+      </p>
+    </div>
+
+    <h3>Abhi site live hai</h3>
+    <div class="card ok">
+      <span class="ct">Deploy ho chuka hai</span>
+      <p style="margin-bottom:0">
+        Website Vercel par chal rahi hai, database (Neon Postgres) jud chuka hai, aur course
+        ka syllabus bhi bhara hua hai. Abhi woh <strong>Vercel ke login ke peeche</strong> hai —
+        public ke liye kholne ke liye Deployment Protection band karni hogi (Section 12 dekhein).
       </p>
     </div>
 
@@ -203,7 +215,16 @@
       <tr><td>Payment</td><td>Razorpay (Cashfree bhi chalega)</td><td>UPI, Card, Net Banking — sab ek jagah</td></tr>
       <tr><td>Hosting</td><td>Vercel</td><td>Git push karte hi deploy, free SSL, auto scaling</td></tr>
       <tr><td>Database hosting</td><td>Neon (Vercel ke andar se)</td><td>Free tier, Singapore region — India ke paas</td></tr>
+      <tr><td>Website ki bhasha</td><td>English</td><td>Saara text ek dictionary file mein — Hindi baad mein jodna aasaan</td></tr>
     </table>
+
+    <h3>Bhasha ek jagah se chalti hai</h3>
+    <p>
+      Website par dikhne wala har shabd <code>src/i18n/dictionaries/en.ts</code> se aata hai —
+      kisi page ya button ke andar likha hua nahi hai. Iska faayda do hain: text badalna ho to
+      ek hi file kholni padti hai, aur Hindi (ya koi aur bhasha) jodni ho to sirf nayi
+      dictionary banani hoti hai — pages chhune ki zaroorat nahi padti.
+    </p>
 
     <h3>Database kyun PostgreSQL</h3>
     <p>Is site ka saara data aapas mein juda hua hai:</p>
@@ -414,6 +435,10 @@
       <p style="margin-bottom:0">Pehli baar <code>/setup</code> page par form bhar kar
         syllabus aur admin account banaya. Yeh form sirf tab tak chalta hai jab tak
         database bilkul khaali hai.</p></div></div>
+    <div class="step"><span class="n">12</span><div class="b">
+      <div class="t">WhatsApp number aur accounts</div>
+      <p style="margin-bottom:0">Support number set kiya, aur testing ke liye ek admin
+        aur ek student account banaya.</p></div></div>
   </div>
 </section>
 
@@ -476,7 +501,18 @@
       <li>Module ya lesson <strong>delete</strong> karna</li>
       <li><strong>Students ki list</strong> dekhna — naam, mobile, email, kab join kiya, kitna progress</li>
       <li>Naam/email/mobile se student <strong>search</strong> karna</li>
+      <li><strong>Course ki jaankari</strong> badalna — title, tagline, description aur price</li>
+      <li>Module ka <strong>naam badalna</strong></li>
     </ul>
+
+    <div class="card">
+      <span class="ct">Password reset</span>
+      <p style="margin-bottom:0">
+        Abhi "password bhool gaye" wala apne aap chalne wala flow nahi bana hai. Tab tak admin
+        kisi bhi student ka password set kar sakta hai, aur zaroorat padne par kisi ko bina
+        payment ke access bhi de sakta hai (jaise koi seedha UPI se paisa bhej de).
+      </p>
+    </div>
 
     <h3>Video kaise jodein</h3>
     <p>
@@ -534,22 +570,36 @@ npm run docker:up     <span class="c"># app + PostgreSQL, dono ek saath</span></
     <h3>Taiyaar</h3>
     <table>
       <tr><td style="width:52mm">Website live hai</td><td><span class="pill ok">Ho gaya</span> Vercel par</td></tr>
-      <tr><td>Database jud gaya</td><td><span class="pill ok">Ho gaya</span> Neon Postgres, Singapore</td></tr>
+      <tr><td>Database jud gaya</td><td><span class="pill ok">Ho gaya</span> Neon Postgres, Singapore region</td></tr>
       <tr><td>Course ka syllabus</td><td><span class="pill ok">Ho gaya</span> 6 modules, 20 lessons</td></tr>
-      <tr><td>Admin account</td><td><span class="pill ok">Ho gaya</span></td></tr>
+      <tr><td>Admin + student account</td><td><span class="pill ok">Ho gaya</span> Login details alag se bheji gayi hain</td></tr>
       <tr><td>Saare 12 features</td><td><span class="pill ok">Ho gaya</span></td></tr>
       <tr><td>Video security</td><td><span class="pill ok">Ho gaya</span> test kiya hua</td></tr>
+      <tr><td>Website ki bhasha</td><td><span class="pill ok">Ho gaya</span> Poori English</td></tr>
+      <tr><td>WhatsApp number</td><td><span class="pill ok">Ho gaya</span> Support button live number par jaata hai</td></tr>
     </table>
 
     <h3>Baaki</h3>
     <table>
-      <tr><td style="width:52mm">Asli videos</td><td><span class="pill warn">Baaki</span> Video host par upload karke admin se jodni hain</td></tr>
-      <tr><td>WhatsApp number</td><td><span class="pill warn">Baaki</span> Abhi placeholder hai</td></tr>
+      <tr><td style="width:52mm">Site public karna</td><td><span class="pill warn">Baaki</span> Abhi Vercel login ke peeche hai (neeche dekhein)</td></tr>
+      <tr><td>Asli videos</td><td><span class="pill warn">Baaki</span> Video host par upload karke admin se jodni hain</td></tr>
       <tr><td>Razorpay live keys</td><td><span class="pill warn">Baaki</span> Abhi demo mode — asli paisa nahi katta</td></tr>
       <tr><td>Sohail ki photo</td><td><span class="pill warn">Baaki</span> Mentor section mein placeholder</td></tr>
       <tr><td>Privacy / Terms / Refund</td><td><span class="pill warn">Baaki</span> Payment gateway ko chahiye hote hain</td></tr>
-      <tr><td>Password reset flow</td><td><span class="pill warn">Baaki</span> Scope mein nahi tha</td></tr>
+      <tr><td>Password reset flow</td><td><span class="pill warn">Baaki</span> Tab tak admin reset kar sakta hai</td></tr>
+      <tr><td>Apna domain</td><td><span class="pill warn">Baaki</span> Abhi vercel.app wala address hai</td></tr>
     </table>
+
+    <div class="card warn">
+      <span class="ct">Site abhi public nahi hai</span>
+      <p style="margin-bottom:0">
+        Vercel ki <strong>Deployment Protection</strong> on hai, isliye site sirf us vyakti ko
+        khulti hai jo Vercel account mein logged in ho. Kisi aur ko link bhejne par use Vercel
+        ka login page dikhega. Students ke liye kholne se pehle: Vercel &rsaquo; Settings
+        &rsaquo; Deployment Protection &rsaquo; band karein. Launch se pehle videos, payment
+        keys aur policy pages taiyaar kar lena behtar rahega.
+      </p>
+    </div>
   </div>
 
   <div class="sec">
@@ -581,7 +631,8 @@ npm run docker:up     <span class="c"># app + PostgreSQL, dono ek saath</span></
     </div>
 
     <div class="foot">
-      Sohail YouTube Academy — Project Guide · 13 October 2026<br>
+      Sohail YouTube Academy — Project Guide · 13 October 2026 (updated)<br>
+      Login details is document mein jaan-boojh kar nahi likhi gayi — woh alag se bheji jaati hain.<br>
       Repository: github.com/preeti28dec/Youtube-Academy · Technical details: README.md, DATABASE.md, VERCEL.md
     </div>
   </div>
