@@ -1,0 +1,127 @@
+// Sohail YouTube Academy — database schema
+//
+// Local dev ke liye provider "sqlite" hai (zero setup, koi server nahi).
+// Production ke liye provider ko "postgresql" kar dein aur DATABASE_URL badal dein
+// (details DATABASE.md mein). Niche koi bhi field type provider-specific nahi hai,
+// isliye schema dono par bina badlaav chalta hai.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Student + admin, dono isi table mein. role = "student" | "admin"
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  mobile       String    @unique
+  passwordHash String?
+  role         String    @default("student")
+  createdAt    DateTime  @default(now())
+
+  orders    Order[]
+  enrollments Enrollment[]
+  progress  Progress[]
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  subtitle    String
+  description String
+  /// Paise mein (₹1,499 => 149900). Floating point se bachne ke liye integer.
+  pricePaise  Int
+  createdAt   DateTime @default(now())
+
+  modules     Module[]
+  orders      Order[]
+  enrollments Enrollment[]
+}
+
+model Module {
+  id        String   @id @default(cuid())
+  courseId  String
+  title     String
+  position  Int
+  createdAt DateTime @default(now())
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@index([courseId, position])
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  moduleId    String
+  title       String
+  /// "14:30" format — UI mein aise hi dikhta hai.
+  duration    String
+  /// Seconds mein — total course length jodne ke liye.
+  durationSec Int      @default(0)
+  /// true => bina login/payment bhi preview chalega.
+  isFree      Boolean  @default(false)
+  /// Secure video ka reference. Local demo mein file ka naam (public/videos/<x>),
+  /// production mein VdoCipher/Bunny ka video id.
+  videoKey    String?
+  position    Int
+  createdAt   DateTime @default(now())
+
+  module   Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress Progress[]
+
+  @@index([moduleId, position])
+}
+
+/// Razorpay / Cashfree order. Course access sirf status = "paid" par milta hai.
+model Order {
+  id            String   @id @default(cuid())
+  userId        String
+  courseId      String
+  amountPaise   Int
+  /// "created" | "paid" | "failed"
+  status        String   @default("created")
+  /// "upi" | "card" | "netbanking"
+  method        String
+  gatewayOrderId   String? @unique
+  gatewayPaymentId String?
+  createdAt     DateTime @default(now())
+  paidAt        DateTime?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+/// Yahi row course access ka single source of truth hai.
+model Enrollment {
+  id         String   @id @default(cuid())
+  userId     String
+  courseId   String
+  orderId    String?
+  createdAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model Progress {
+  id          String    @id @default(cuid())
+  userId      String
+  lessonId    String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
