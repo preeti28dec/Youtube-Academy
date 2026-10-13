@@ -12,11 +12,22 @@ export function Header({ user }: { user: SessionUser | null }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const nav: NavItem[] = [
-    { href: "/", label: "Home" },
-    { href: "/course", label: "Course Details" },
-    user ? { href: "/dashboard", label: "My Course" } : { href: "/login", label: "Login" },
-  ];
+  // Home par anchors (woh saare sections wahin hain); baaki pages par
+  // seedha /course ka link, kyunki anchor sirf landing par kaam karega.
+  const onHome = pathname === "/";
+  const nav: NavItem[] = onHome
+    ? [
+        { href: "#course", label: "Course" },
+        { href: "#curriculum", label: "Curriculum" },
+        { href: "#mentor", label: "Mentor" },
+        { href: "#faqs", label: "FAQs" },
+      ]
+    : [
+        { href: "/", label: "Home" },
+        { href: "/course", label: "Course Details" },
+      ];
+
+  nav.push(user ? { href: "/dashboard", label: "My Course" } : { href: "/login", label: "Login" });
   if (user?.role === "admin") nav.push({ href: "/admin", label: "Admin" });
 
   const cta = user

@@ -3,6 +3,11 @@ import { redirect } from "next/navigation";
 import { getCourse } from "@/lib/course";
 import { rupees } from "@/lib/format";
 import { CheckIcon, LockIcon, PlayIcon } from "@/components/icons";
+import { StatsStrip } from "@/components/home/StatsStrip";
+import { CurriculumPreview } from "@/components/home/CurriculumPreview";
+import { MentorSection } from "@/components/home/MentorSection";
+import { FaqSection } from "@/components/home/FaqSection";
+import { FinalCta } from "@/components/home/FinalCta";
 
 const BENEFITS = [
   {
@@ -108,8 +113,11 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ---------- stats ---------- */}
+      <StatsStrip lessonCount={course.lessonCount} totalDuration={course.totalDuration} />
+
       {/* ---------- benefits ---------- */}
-      <section className="mx-auto w-full max-w-[1120px] px-5 pt-16 pb-6">
+      <section id="course" className="mx-auto w-full max-w-[1120px] scroll-mt-20 px-5 pt-16 pb-6">
         <h2 className="mb-2 text-[clamp(24px,3.4vw,32px)] font-extrabold leading-[1.15] tracking-[-0.02em] text-ink">
           Is course mein aapko kya milega
         </h2>
@@ -132,6 +140,17 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ---------- curriculum ---------- */}
+      <CurriculumPreview
+        modules={course.modules}
+        moduleCount={course.moduleCount}
+        lessonCount={course.lessonCount}
+        totalDuration={course.totalDuration}
+      />
+
+      {/* ---------- mentor ---------- */}
+      <MentorSection />
 
       {/* ---------- price ---------- */}
       <section className="mx-auto w-full max-w-[1120px] px-5 pt-12 pb-18">
@@ -171,6 +190,12 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ---------- faq ---------- */}
+      <FaqSection />
+
+      {/* ---------- final cta ---------- */}
+      <FinalCta price={price} />
     </>
   );
 }
