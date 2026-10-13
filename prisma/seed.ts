@@ -1,61 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { COURSE, SYLLABUS, toSeconds } from "../src/lib/starter-content";
 
 const prisma = new PrismaClient();
-
-/** [module title, [[lesson title, duration, isFree?], ...]] */
-const SYLLABUS: [string, [string, string, boolean?][]][] = [
-  [
-    "YouTube Basics & Channel Setup",
-    [
-      ["Course introduction", "06:12", true],
-      ["Channel ka niche kaise choose karein", "14:30"],
-      ["Channel setup: name, logo, banner", "18:05"],
-      ["YouTube Studio ka overview", "12:40"],
-    ],
-  ],
-  [
-    "Content Planning & Research",
-    [
-      ["Video ideas kaise dhundhein", "16:20"],
-      ["Keyword research tools", "19:45"],
-      ["Competitor analysis", "13:10"],
-    ],
-  ],
-  [
-    "Mobile se Shooting & Editing",
-    [
-      ["Mobile shooting setup", "15:00", true],
-      ["Lighting aur audio basics", "11:35"],
-      ["Mobile editing step-by-step", "24:50"],
-      ["Shorts kaise banayein", "17:15"],
-    ],
-  ],
-  [
-    "Thumbnail, Title & SEO",
-    [
-      ["Click-worthy thumbnails", "20:10"],
-      ["Title aur description likhna", "14:25"],
-      ["Tags, hashtags aur chapters", "10:55"],
-    ],
-  ],
-  [
-    "Growth & Audience",
-    [
-      ["Upload schedule aur consistency", "09:40"],
-      ["YouTube Analytics samjhein", "21:30"],
-      ["Comments aur community se judna", "08:50"],
-    ],
-  ],
-  [
-    "Monetization",
-    [
-      ["YPP eligibility aur apply karna", "13:20"],
-      ["Sponsorship aur brand deals", "16:45"],
-      ["Affiliate income", "12:05"],
-    ],
-  ],
-];
 
 /** Demo students — admin panel ki list bhari dikhe. */
 const DEMO_STUDENTS: [string, string, string, number][] = [
@@ -66,11 +13,6 @@ const DEMO_STUDENTS: [string, string, string, number][] = [
   ["Arjun Patel", "arjunpatel@gmail.com", "9099055873", 60],
   ["Sana Ansari", "sana.ansari@gmail.com", "7021088463", 5],
 ];
-
-function toSeconds(mmss: string): number {
-  const [m, s] = mmss.split(":").map((n) => parseInt(n, 10) || 0);
-  return m * 60 + s;
-}
 
 async function main() {
   console.log("Seeding...");
@@ -84,16 +26,7 @@ async function main() {
   await prisma.course.deleteMany();
   await prisma.user.deleteMany();
 
-  const course = await prisma.course.create({
-    data: {
-      slug: "youtube-growth-masterclass",
-      title: "YouTube Growth Masterclass",
-      subtitle: "Hindi mein · Mobile-friendly · Lifetime access",
-      description:
-        "Yeh course un logon ke liye hai jo YouTube channel shuru karna chahte hain ya apne existing channel ko grow karna chahte hain. Saari videos Hindi mein hain aur mobile par aaram se dekhi ja sakti hain. Course ke end tak aap khud video plan, shoot, edit aur publish kar payenge.",
-      pricePaise: 149900,
-    },
-  });
+  const course = await prisma.course.create({ data: COURSE });
 
   for (const [mi, [moduleTitle, lessons]] of SYLLABUS.entries()) {
     await prisma.module.create({

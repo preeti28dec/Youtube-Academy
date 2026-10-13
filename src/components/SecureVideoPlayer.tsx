@@ -15,10 +15,12 @@ export function SecureVideoPlayer({
   lessonId,
   watermark,
   poster,
+  labels,
 }: {
   lessonId: string;
   watermark: string;
   poster?: string;
+  labels: { secure: string; loading: string; failed: string };
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [src, setSrc] = useState<string | null>(null);
@@ -38,11 +40,11 @@ export function SecureVideoPlayer({
         });
         const data = await res.json();
         if (cancelled) return;
-        if (!res.ok) throw new Error(data.error ?? "Video load nahi hui.");
+        if (!res.ok) throw new Error(data.error ?? labels.failed);
         setSrc(data.url);
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Video load nahi hui.");
+          setError(err instanceof Error ? err.message : labels.failed);
         }
       }
     })();
@@ -67,13 +69,13 @@ export function SecureVideoPlayer({
           onContextMenu={(e) => e.preventDefault()}
           className="h-full w-full"
           onError={() =>
-            setError("Video chal nahi paayi. Page refresh karein ya WhatsApp par batayein.")
+            setError(labels.failed)
           }
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center px-6 text-center">
           <span className="text-[13.5px] font-medium text-onDark">
-            {error ?? "Secure video load ho rahi hai..."}
+            {error ?? labels.loading}
           </span>
         </div>
       )}
@@ -85,7 +87,7 @@ export function SecureVideoPlayer({
 
       <span className="pointer-events-none absolute top-3 right-3 flex items-center gap-1.5 rounded-[7px] bg-white/10 px-2.25 py-1.5 text-[11px] font-semibold text-onDark">
         <LockIcon size={12} />
-        Secure stream
+        {labels.secure}
       </span>
     </div>
   );

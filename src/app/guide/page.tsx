@@ -5,114 +5,114 @@ export const metadata = { title: "Project guide · Sohail YouTube Academy" };
 const SECURITY_POINTS = [
   {
     t: "Secure video hosting",
-    d: "Videos YouTube/Google Drive par nahi, VdoCipher ya Bunny Stream jaise paid secure host par upload hongi. Wahan koi public download link hota hi nahi.",
+    d: "Videos are not kept on YouTube or Google Drive, but on a paid secure host such as VdoCipher or Bunny Stream — where no public download link exists in the first place.",
   },
   {
-    t: "Har baar naya, expire hone wala link",
-    d: "Jab enrolled student lesson kholta hai, server check karta hai ki usne payment kiya hai, phir sirf usi ke liye kuch minute ka signed token banata hai. Link copy karke kisi aur ko bhejne par woh chalega nahi.",
+    t: "A fresh link that expires",
+    d: "When an enrolled student opens a lesson, the server checks that they paid, then issues a signed token valid for a couple of minutes, for that student only. Copying the link and sending it to someone else simply will not work.",
   },
   {
     t: "Encrypted streaming + DRM",
-    d: "Video chhote encrypted tukdon (HLS/DRM) mein stream hoti hai. Download manager ya “inspect element” se poori file nahi milti.",
+    d: "Video is streamed in small encrypted chunks (HLS/DRM). A download manager or “inspect element” will not give anyone the whole file.",
   },
   {
     t: "Domain lock",
-    d: "Player sirf aapki website ke domain par chalega. Kisi aur site par embed karne se video nahi khulegi.",
+    d: "The player only runs on your own domain. Embedding it anywhere else will not play the video.",
   },
   {
-    t: "Student ka watermark",
-    d: "Video ke upar student ka email/mobile halka sa dikhta rahega. Agar koi recording leak kare to pata chal jayega kisne kiya.",
+    t: "Per-student watermark",
+    d: "Each student's email shows faintly over the video. If a recording ever leaks, it is clear who it came from.",
   },
   {
     t: "Login limit",
-    d: "Ek account ek time par 1–2 device par hi login rahega, taaki password share karke kai log ek account na chalayein.",
+    d: "An account stays logged in on only one or two devices at a time, so a shared password cannot be used by a crowd.",
   },
 ];
 
 const FEATURE_GUIDE = [
   {
     t: "Home / Landing page",
-    d: "Course ka parichay, benefits, price aur Enroll Now / Buy Now button. Intro video free preview ke roop mein.",
+    d: "Course introduction, benefits, price and the Enroll Now button. The intro video is available as a free preview.",
   },
   {
     t: "Course details",
-    d: "Poora description, “aap kya seekhenge”, aur saare modules/lessons ki list duration ke saath. Free preview lessons alag se marked.",
+    d: "The full description, what you will learn, and every module and lesson with its duration. Free preview lessons are marked separately.",
   },
   {
     t: "Payment page",
-    d: "Naam, mobile, email bharke Razorpay ya Cashfree se UPI, Card, Net Banking ke through payment.",
+    d: "Name, mobile and email, then payment by UPI, Card or Net Banking through Razorpay or Cashfree.",
   },
   {
-    t: "Auto account + access",
-    d: "Payment confirm hote hi account apne aap banta hai, course unlock hota hai, aur password email/WhatsApp par jaata hai.",
+    t: "Automatic account + access",
+    d: "The moment payment is confirmed the account is created, the course unlocks, and the password is sent by email and WhatsApp.",
   },
   {
     t: "Student login",
-    d: "Email ya mobile + password se login. “Password bhool gaye” se email/OTP ke zariye reset.",
+    d: "Log in with email or mobile plus a password. “Forgot password” resets it over email or OTP.",
   },
   {
     t: "Student dashboard",
-    d: "Kharida hua course, saare modules aur lessons, aur “Continue learning” button jo agle adhure lesson par le jaata hai.",
+    d: "The purchased course, all modules and lessons, and a “Continue learning” button that jumps to the next unfinished lesson.",
   },
   {
     t: "Video course",
-    d: "Saari videos website ke andar hi secure player mein chalti hain. Bina login/payment ke koi lesson nahi khulta (free preview chhodkar).",
+    d: "Every video plays inside the website in a secure player. Without login and payment no lesson opens, apart from the free previews.",
   },
   {
     t: "Progress tracking",
-    d: "Har lesson par “Mark as complete”. Dashboard par percentage aur har module mein kitne lesson complete hue, dikhta hai.",
+    d: "A “Mark as complete” on every lesson. The dashboard shows an overall percentage and how many lessons are done in each module.",
   },
   {
     t: "WhatsApp support",
-    d: "Har page par neeche-right mein WhatsApp button, jo aapke number par pehle se likhe message ke saath chat kholta hai.",
+    d: "A WhatsApp button sits at the bottom right of every page and opens a chat to your number with a message already written.",
   },
   {
     t: "Admin panel",
-    d: "Module aur lesson add/edit/delete, video upload, free preview set karna, aur students ki list (naam, mobile, email, date, progress).",
+    d: "Add, edit and delete modules and lessons, attach videos, mark free previews, and see the student list — name, mobile, email, join date and progress.",
   },
   {
     t: "Mobile friendly",
-    d: "Saare pages mobile ke liye pehle design kiye gaye hain — bade buttons, ek-column layout, aur mobile par full-width video.",
+    d: "Every page was designed for mobile first — large buttons, a single column, and full-width video on a phone.",
   },
   {
     t: "Simple design",
-    d: "Halka, saaf look. Koi bhaari animation ya extra features nahi, taaki site tez chale aur maintenance sasta rahe.",
+    d: "A light, clean look. No heavy animation or extra features, so the site stays fast and maintenance stays cheap.",
   },
 ];
 
 const STACK = [
   {
     k: "Website + admin",
-    v: "Next.js 15 (React) — ek hi app mein frontend aur Node.js backend. Sirf yahi 12 features, koi extra plugin nahi.",
+    v: "Next.js 15 (React) — frontend and Node.js backend in one app. Only these 12 features, no extra plugins.",
   },
   {
     k: "Database",
-    v: "PostgreSQL (Prisma ORM ke saath) — students, orders, lessons aur progress ke liye. Local dev SQLite par chalta hai, bina kisi server setup ke.",
+    v: "PostgreSQL with the Prisma ORM — students, orders, lessons and progress. Local development runs on SQLite with no server setup at all.",
   },
   {
     k: "Payment gateway",
-    v: "Razorpay ya Cashfree — UPI, Card, Net Banking, aur webhook se payment confirmation.",
+    v: "Razorpay or Cashfree — UPI, Card, Net Banking, with a webhook confirming each payment.",
   },
   {
     k: "Video hosting",
-    v: "VdoCipher (DRM + watermark, sabse zyada secure) ya Bunny Stream (sasta, token + domain lock).",
+    v: "VdoCipher (DRM + watermark, the most secure) or Bunny Stream (cheaper, token + domain lock).",
   },
   {
     k: "Email / SMS",
-    v: "Login details aur password reset ke liye transactional email (jaise Brevo / Amazon SES).",
+    v: "Transactional email for login details and password resets (Brevo or Amazon SES).",
   },
   {
     k: "Hosting",
-    v: "Ek chhota cloud server ya managed hosting + SSL (https). Videos alag host par rehne se server halka rahega.",
+    v: "A small cloud server or managed hosting with SSL (https). Keeping video on a separate host keeps this server light.",
   },
 ];
 
 const FLOW = [
   "Student pays",
-  "Gateway webhook verify",
-  "Account create",
-  "Course unlock",
-  "Login link email + WhatsApp",
+  "Gateway webhook verifies",
+  "Account created",
+  "Course unlocked",
+  "Login link by email + WhatsApp",
 ];
 
 export default function GuidePage() {
@@ -123,11 +123,11 @@ export default function GuidePage() {
           Project guide
         </span>
         <h1 className="text-[clamp(26px,4vw,34px)] font-extrabold leading-[1.15] tracking-[-0.025em] text-ink">
-          Website ki poori jaankari
+          How the whole website works
         </h1>
         <p className="text-[15.5px] leading-[1.65] text-body">
-          Har feature kaise kaam karega, kaunsi services lagengi, aur course videos kaise secure
-          rahenge.
+          What each feature does, which services are involved, and how the course videos stay
+          secure.
         </p>
       </div>
 
@@ -135,12 +135,12 @@ export default function GuidePage() {
       <section className="flex flex-col gap-3.5 rounded-2xl bg-ink p-[clamp(20px,4vw,30px)] text-white">
         <h2 className="flex items-center gap-2.5 text-[19px] font-extrabold leading-snug">
           <ShieldIcon size={20} className="shrink-0 text-[#7b81f0]" />
-          Kya koi direct video link se course dekh paayega?
+          Can anyone watch the course from a direct video link?
         </h2>
         <p className="text-base leading-relaxed font-semibold">
-          Nahi. Agar videos secure video hosting (jaise VdoCipher ya Bunny Stream) par hon aur
-          neeche diye gaye steps follow hon, to bina payment wala koi bhi vyakti link copy karke
-          video nahi chala payega.
+          No. As long as the videos sit on secure video hosting (VdoCipher or Bunny Stream) and
+          the steps below are followed, nobody who hasn&rsquo;t paid can copy a link and play the
+          video.
         </p>
 
         <ol className="flex flex-col gap-3 pt-1">
@@ -158,16 +158,17 @@ export default function GuidePage() {
         </ol>
 
         <p className="rounded-[10px] bg-[#d3a23e]/15 px-3.75 py-3.25 text-[13.5px] leading-relaxed font-medium text-[#f1d79a]">
-          Dhyan dein: duniya ka koi bhi system mobile/screen recording ko 100% nahi rok sakta. DRM
-          kai devices par recording ko black screen kar deta hai, aur watermark se leak karne wala
-          student pehchana ja sakta hai — isliye leak ka risk bahut kam ho jaata hai.
+          Worth being honest about: no system anywhere can fully stop someone recording their own
+          screen on a phone. What DRM does is black out the recording on many devices, and the
+          watermark makes a leaked copy traceable back to the student — which together bring the
+          risk down a great deal.
         </p>
       </section>
 
       {/* ---------- feature list ---------- */}
       <section className="overflow-hidden rounded-2xl border border-line bg-surface">
         <h2 className="border-b border-line px-5 py-4 text-base font-bold text-ink">
-          Saare features — kaise kaam karenge
+          Every feature — and how it works
         </h2>
         {FEATURE_GUIDE.map((f, i) => (
           <div
@@ -188,7 +189,7 @@ export default function GuidePage() {
       {/* ---------- stack ---------- */}
       <section className="overflow-hidden rounded-2xl border border-line bg-surface">
         <h2 className="border-b border-line px-5 py-4 text-base font-bold text-ink">
-          Recommended setup (kam cost, kam maintenance)
+          Recommended setup (low cost, low maintenance)
         </h2>
         {STACK.map((s) => (
           <div
@@ -203,7 +204,7 @@ export default function GuidePage() {
 
       {/* ---------- payment flow ---------- */}
       <section className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-5">
-        <h2 className="text-base font-bold text-ink">Payment ke baad automatic flow</h2>
+        <h2 className="text-base font-bold text-ink">What happens automatically after payment</h2>
         <div className="flex flex-wrap items-center gap-2">
           {FLOW.map((f) => (
             <span
@@ -215,8 +216,9 @@ export default function GuidePage() {
           ))}
         </div>
         <p className="text-sm leading-relaxed text-body">
-          Payment gateway ka webhook server ko confirm karta hai — sirf browser ke &ldquo;success&rdquo;
-          message par bharosa nahi kiya jaata. Isse fake payment se course unlock nahi hota.
+          The payment gateway&rsquo;s webhook confirms the payment to our server — the
+          browser&rsquo;s &ldquo;success&rdquo; message is never trusted on its own. That is what
+          stops a faked payment from unlocking the course.
         </p>
       </section>
     </div>

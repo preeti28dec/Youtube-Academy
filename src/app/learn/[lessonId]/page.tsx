@@ -6,6 +6,7 @@ import { formatMobile } from "@/lib/format";
 import { SecureVideoPlayer } from "@/components/SecureVideoPlayer";
 import { MarkCompleteButton } from "@/components/MarkCompleteButton";
 import { ArrowLeftIcon, CheckIcon } from "@/components/icons";
+import { getDictionary, t } from "@/i18n";
 
 export const metadata = { title: "Video lesson · Sohail YouTube Academy" };
 
@@ -36,13 +37,15 @@ export default async function LearnPage({
     redirect(user ? "/checkout" : "/login");
   }
 
+  const d = getDictionary();
+  const L = d.learn;
   const done = user ? await getCompletedLessonIds(user.id) : new Set<string>();
   const doneCount = flat.filter((l) => done.has(l.id)).length;
   const pct = flat.length ? Math.round((doneCount / flat.length) * 100) : 0;
 
   const prev = index > 0 ? flat[index - 1] : null;
   const nextLesson = index < flat.length - 1 ? flat[index + 1] : null;
-  const watermark = user ? `${user.email} · +91 ${formatMobile(user.mobile)}` : "Free preview";
+  const watermark = user ? `${user.email} · +91 ${formatMobile(user.mobile)}` : L.freePreview;
 
   return (
     <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-4 px-5 pt-5 pb-18">
@@ -51,16 +54,20 @@ export default async function LearnPage({
         className="flex items-center gap-1.5 self-start py-2 text-sm font-semibold text-body hover:text-brand"
       >
         <ArrowLeftIcon size={16} />
-        {enrolled ? "Dashboard" : "Course details"}
+        {enrolled ? L.backToDashboard : L.backToCourse}
       </Link>
 
       <div className="flex flex-wrap items-start gap-5">
         <div className="flex min-w-0 flex-[999_1_600px] flex-col gap-4">
-          <SecureVideoPlayer lessonId={lesson.id} watermark={watermark} />
+          <SecureVideoPlayer
+            lessonId={lesson.id}
+            watermark={watermark}
+            labels={{ secure: L.secureStream, loading: L.loading, failed: L.loadFailed }}
+          />
 
           <div className="flex flex-col gap-1.5">
             <span className="text-[12.5px] font-semibold text-muted">
-              Module {lesson.modNum} · {lesson.modTitle}
+              {t(L.moduleLabel, { num: lesson.modNum, title: lesson.modTitle })}
             </span>
             <h1 className="text-[clamp(20px,3vw,26px)] font-extrabold leading-tight tracking-[-0.02em] text-ink">
               {lesson.title}
@@ -69,13 +76,17 @@ export default async function LearnPage({
 
           <div className="flex flex-wrap gap-2.5">
             {enrolled ? (
-              <MarkCompleteButton lessonId={lesson.id} initialDone={done.has(lesson.id)} />
+              <MarkCompleteButton
+                lessonId={lesson.id}
+                initialDone={done.has(lesson.id)}
+                labels={{ done: L.completed, todo: L.markComplete }}
+              />
             ) : (
               <Link
                 href="/checkout"
                 className="flex-[1_1_200px] rounded-xl bg-brand px-4.5 py-3.5 text-center text-[14.5px] font-bold text-white hover:bg-brand-dark"
               >
-                Poora course unlock karein
+                {L.unlockCta}
               </Link>
             )}
             {prev && (
@@ -83,7 +94,7 @@ export default async function LearnPage({
                 href={`/learn/${prev.id}`}
                 className="rounded-xl border border-line-strong bg-surface px-4 py-3.5 text-sm font-semibold text-ink hover:bg-[#f7f8fa]"
               >
-                ← Previous
+                {L.previous}
               </Link>
             )}
             {nextLesson && (
@@ -91,7 +102,7 @@ export default async function LearnPage({
                 href={`/learn/${nextLesson.id}`}
                 className="rounded-xl border border-line-strong bg-surface px-4 py-3.5 text-sm font-semibold text-ink hover:bg-[#f7f8fa]"
               >
-                Next →
+                {L.next}
               </Link>
             )}
           </div>
@@ -100,7 +111,7 @@ export default async function LearnPage({
         {/* ---------- sidebar: progress + lesson list ---------- */}
         <aside className="flex min-w-0 flex-[1_1_300px] flex-col overflow-hidden rounded-[14px] border border-line bg-surface">
           <div className="flex flex-col gap-2.5 border-b border-line px-4.5 py-4">
-            <span className="text-[15px] font-bold text-ink">Course progress</span>
+            <span className="text-[15px] font-bold text-ink">{L.courseProgress}</span>
             <div className="flex items-center gap-2.5">
               <div className="h-1.75 flex-1 overflow-hidden rounded-full bg-fill">
                 <div className="h-full bg-ok" style={{ width: `${pct}%` }} />

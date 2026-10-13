@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
   if (!name || !mobile || !isValidEmail(email)) {
     return NextResponse.json(
-      { error: "Naam, 10-digit mobile number aur sahi email bharein." },
+      { error: "Enter your name, a 10-digit mobile number and a valid email." },
       { status: 400 },
     );
   }
@@ -51,14 +51,14 @@ export async function POST(req: Request) {
     });
     if (already) {
       return NextResponse.json(
-        { error: "Is email/mobile se course pehle se khareeda hua hai. Login karein." },
+        { error: "This email/mobile has already bought the course. Please log in." },
         { status: 409 },
       );
     }
     // Mismatch (email kisi aur ka, mobile kisi aur ka) par aage badhna safe nahi.
     if (existing.email !== email || existing.mobile !== mobile) {
       return NextResponse.json(
-        { error: "Yeh email ya mobile pehle se registered hai. Login karein ya dusra use karein." },
+        { error: "This email or mobile is already registered. Log in, or use a different one." },
         { status: 409 },
       );
     }

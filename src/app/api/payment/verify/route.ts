@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   const ok = verifyPaymentSignature(gatewayOrderId, body?.paymentId ?? "", body?.signature ?? "");
   if (!ok) {
     await prisma.order.updateMany({ where: { gatewayOrderId }, data: { status: "failed" } });
-    return NextResponse.json({ error: "Payment verify nahi hua." }, { status: 400 });
+    return NextResponse.json({ error: "The payment could not be verified." }, { status: 400 });
   }
 
   const order = await prisma.order.findUnique({

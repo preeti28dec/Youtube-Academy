@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { CheckIcon } from "@/components/icons";
 import { BootstrapForm } from "./BootstrapForm";
 
-export const metadata = { title: "Setup zaroori hai · Sohail YouTube Academy" };
+export const metadata = { title: "Setup required · Sohail YouTube Academy" };
 
 // Env har request par padhni hai — build ke waqt ki value cache nahi karni.
 export const dynamic = "force-dynamic";
@@ -13,23 +13,23 @@ export const dynamic = "force-dynamic";
 const ENV_VARS = [
   {
     name: "DATABASE_URL",
-    what: "Postgres ka connection string",
-    how: "Vercel > Storage > Create Database > Neon. Connect karte hi yeh apne aap set ho jaata hai.",
+    what: "Postgres connection string",
+    how: "Vercel > Storage > Create Database > Neon. Connecting it sets this automatically.",
   },
   {
     name: "AUTH_SECRET",
-    what: "Login session sign karne ke liye",
-    how: "Koi lamba random string.",
+    what: "Signs the login session",
+    how: "Any long random string.",
   },
   {
     name: "VIDEO_TOKEN_SECRET",
-    what: "Video playback token sign karne ke liye",
-    how: "Dusra lamba random string — AUTH_SECRET se alag.",
+    what: "Signs the video playback token",
+    how: "A second long random string — different from AUTH_SECRET.",
   },
   {
     name: "NEXT_PUBLIC_WHATSAPP_NUMBER",
-    what: "WhatsApp support button ka number",
-    how: "Country code ke saath, bina + — jaise 919812345678.",
+    what: "Number behind the WhatsApp button",
+    how: "With country code, no plus sign — e.g. 919812345678.",
   },
 ];
 
@@ -58,10 +58,10 @@ export default async function SetupPage() {
             <CheckIcon size={26} strokeWidth={2.6} />
           </span>
           <h1 className="text-[24px] font-extrabold tracking-[-0.02em] text-ink">
-            Setup pura ho chuka hai
+            Setup is complete
           </h1>
           <p className="text-[15px] leading-relaxed text-body">
-            Database jud gaya hai aur course ka content maujood hai.
+            The database is connected and the course content is in place.
           </p>
           <Link
             href="/"
@@ -81,14 +81,14 @@ export default async function SetupPage() {
         <div className="flex flex-col gap-5 rounded-[18px] border border-line bg-surface p-[clamp(24px,5vw,40px)] shadow-[0_4px_16px_rgba(20,24,33,.06)]">
           <div className="flex flex-col gap-2">
             <span className="text-[11px] font-semibold tracking-[0.09em] uppercase text-faint">
-              Aakhri step
+              Last step
             </span>
             <h1 className="text-[clamp(24px,4vw,30px)] font-extrabold leading-tight tracking-[-0.02em] text-ink">
-              Database taiyaar hai — ab course ka content banayein
+              Database is ready — now create the course content
             </h1>
             <p className="text-[15px] leading-relaxed text-body">
-              Neeche se shuruaati syllabus (6 modules, 20 lessons) aur aapka admin account bann
-              jayega. Uske baad /admin se jo chahein badal sakte hain, aur videos jod sakte hain.
+              This creates the starter syllabus (6 modules, 20 lessons) and your admin account.
+              After that you can change anything from /admin and add your videos.
             </p>
           </div>
           <BootstrapForm />
@@ -106,12 +106,12 @@ export default async function SetupPage() {
           </span>
           <h1 className="text-[clamp(24px,4vw,30px)] font-extrabold leading-tight tracking-[-0.02em] text-ink">
             {problem
-              ? "Site deploy ho gayi — ab database jodna baaki hai"
-              : "Database jud gaya — bas do secrets baaki hain"}
+              ? "The site is deployed — the database still needs connecting"
+              : "Database connected — just two secrets left"}
           </h1>
           <p className="text-[15px] leading-relaxed text-body">
-            Code bilkul theek hai. Bas hosting par kuch environment variables set karne hain,
-            uske baad yeh page apne aap hat jayega aur asli site dikhne lagegi.
+            The code is fine. A few environment variables still need to be set on the host;
+            once they are, this page disappears and the real site takes over.
           </p>
         </div>
 
@@ -119,30 +119,30 @@ export default async function SetupPage() {
         <div className="rounded-xl border border-danger-soft bg-danger-soft/60 px-4 py-3.5">
           <span className="text-[13.5px] font-semibold text-danger">
             {problem === "missing"
-              ? "DATABASE_URL set nahi hai."
+              ? "DATABASE_URL is not set."
               : problem === "bad-protocol"
-                ? `${resolved?.from ?? "DATABASE_URL"} postgres ka URL nahi lag raha — abhi uski shuruaat hai ${describeDbUrl(
+                ? `${resolved?.from ?? "DATABASE_URL"} does not look like a Postgres URL — it currently starts with ${describeDbUrl(
                     resolved ? process.env[resolved.from] : undefined,
                   )}`
-                : "Database jud gaya hai. Ab AUTH_SECRET aur VIDEO_TOKEN_SECRET baaki hain — inke bina session aur video token surakshit nahi rehte."}
+                : "The database is connected. AUTH_SECRET and VIDEO_TOKEN_SECRET are still missing — without them sessions and video tokens are not secure."}
           </span>
           {problem === "bad-protocol" && (
             <p className="mt-1.5 text-[13px] leading-relaxed text-body">
-              Value <code className="font-mono">postgresql://</code> se shuru honi chahiye.
-              Sabse aam galti: dashboard mein value quotes ke saath paste kar dena — wahan quotes
-              nahi lagani hoti.
+              The value must start with <code className="font-mono">postgresql://</code>. The most
+              common mistake is pasting it with quotes around it — the dashboard does not want
+              quotes.
             </p>
           )}
         </div>
 
         <ol className="flex flex-col gap-3">
           {[
-            "Vercel dashboard > aapka project > Storage tab > Create Database > Neon (Postgres) chunein.",
-            "Project se connect karein — DATABASE_URL apne aap add ho jaata hai.",
+            "Vercel dashboard > your project > Storage tab > Create Database > choose Neon (Postgres).",
+            "Connect it to the project — DATABASE_URL is added automatically.",
             secretsOk
-              ? "Settings > Environment Variables mein baaki vars (jo neeche bina tick ke hain) daalein."
-              : "Settings > Environment Variables mein AUTH_SECRET aur VIDEO_TOKEN_SECRET daalein (Production aur Preview dono).",
-            "Deployments > latest > Redeploy. Env var add karne se purana build apne aap dobara nahi banta.",
+              ? "In Settings > Environment Variables, add the remaining vars (the ones without a tick below)."
+              : "In Settings > Environment Variables, add AUTH_SECRET and VIDEO_TOKEN_SECRET (both Production and Preview).",
+            "Deployments > latest > Redeploy. Adding an env var does not rebuild an old deployment by itself.",
           ].map((step, i) => (
             <li key={i} className="flex items-start gap-3">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-xs font-bold text-brand">
@@ -179,14 +179,14 @@ export default async function SetupPage() {
         </div>
 
         <div className="rounded-xl border border-line bg-surface-muted px-4 py-3.5">
-          <span className="text-[13px] font-semibold text-body">Random secret banane ke liye:</span>
+          <span className="text-[13px] font-semibold text-body">To generate a random secret:</span>
           <pre className="mt-1.5 overflow-x-auto font-mono text-[12.5px] text-ink">
             node -e &quot;console.log(require(&apos;crypto&apos;).randomBytes(32).toString(&apos;hex&apos;))&quot;
           </pre>
         </div>
 
         <p className="text-[13px] leading-relaxed text-muted">
-          Poori guide repo ke <code className="font-mono">VERCEL.md</code> mein hai.
+          The full guide is in <code className="font-mono">VERCEL.md</code> in the repo.
         </p>
       </div>
     </div>

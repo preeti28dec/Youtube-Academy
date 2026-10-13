@@ -3,14 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ShieldIcon } from "@/components/icons";
+import { type Dictionary, t as fmt } from "@/i18n";
 
 type Method = "upi" | "card" | "netbanking";
 
-const METHODS: { id: Method; label: string; sub: string }[] = [
-  { id: "upi", label: "UPI", sub: "GPay, PhonePe, Paytm" },
-  { id: "card", label: "Card", sub: "Debit / Credit card" },
-  { id: "netbanking", label: "Net Banking", sub: "Sabhi major banks" },
-];
+const METHOD_IDS: Method[] = ["upi", "card", "netbanking"];
 
 const BANKS = [
   "State Bank of India",
@@ -24,7 +21,7 @@ const BANKS = [
 const inputCls =
   "h-12 w-full rounded-[10px] border border-line-strong bg-surface px-3.5 text-[15px] font-medium text-ink placeholder:font-normal placeholder:text-muted";
 
-export function CheckoutForm({ price }: { price: string }) {
+export function CheckoutForm({ price, t }: { price: string; t: Dictionary["checkout"] }) {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", mobile: "", email: "" });
   const [method, setMethod] = useState<Method>("upi");
@@ -48,7 +45,7 @@ export function CheckoutForm({ price }: { price: string }) {
         body: JSON.stringify({ ...form, method }),
       });
       const order = await orderRes.json();
-      if (!orderRes.ok) throw new Error(order.error ?? "Order nahi ban paaya.");
+      if (!orderRes.ok) throw new Error(order.error ?? t.errors.orderFailed);
 
       // 2. Live keys hon to Razorpay checkout kholo, warna demo mode.
       const payment = order.live
@@ -67,11 +64,11 @@ export function CheckoutForm({ price }: { price: string }) {
         body: JSON.stringify({ gatewayOrderId: order.gatewayOrderId, ...payment }),
       });
       const verified = await verifyRes.json();
-      if (!verifyRes.ok) throw new Error(verified.error ?? "Payment verify nahi hua.");
+      if (!verifyRes.ok) throw new Error(verified.error ?? t.errors.verifyFailed);
 
       router.push(`/checkout/success?order=${encodeURIComponent(verified.orderId)}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Kuch galat ho gaya. Dobara koshish karein.");
+      setError(err instanceof Error ? err.message : t.errors.generic);
       setBusy(false);
     }
   }
@@ -83,27 +80,27 @@ export function CheckoutForm({ price }: { price: string }) {
     >
       <div className="flex flex-col gap-1.5">
         <h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-ink">
-          Checkout
+          {t.title}
         </h1>
         <span className="text-[14.5px] leading-normal text-body">
-          Apni details bharein. Isi email/mobile se aapka student account banega.
+          {t.lead}
         </span>
       </div>
 
       <div className="flex flex-col gap-3.5">
         <label className="flex flex-col gap-1.75">
-          <span className="text-[13px] font-semibold text-body">Full name</span>
+          <span className="text-[13px] font-semibold text-body">{t.fullName}</span>
           <input
             value={form.name}
             onChange={set("name")}
-            placeholder="Jaise: Rahul Sharma"
+            placeholder={t.namePlaceholder}
             autoComplete="name"
             className={inputCls}
           />
         </label>
         <div className="grid gap-3.5 sm:grid-cols-2">
           <label className="flex flex-col gap-1.75">
-            <span className="text-[13px] font-semibold text-body">Mobile number</span>
+            <span className="text-[13px] font-semibold text-body">{t.mobile}</span>
             <div className="flex h-12 overflow-hidden rounded-[10px] border border-line-strong focus-within:border-brand focus-within:shadow-[0_0_0_3px_var(--color-brand-soft)]">
               <span className="flex items-center border-r border-line bg-surface-muted px-3 text-sm font-semibold text-body">
                 +91
@@ -114,19 +111,19 @@ export function CheckoutForm({ price }: { price: string }) {
                 inputMode="numeric"
                 maxLength={10}
                 autoComplete="tel"
-                placeholder="98XXXXXXXX"
+                placeholder={t.mobilePlaceholder}
                 className="min-w-0 flex-1 px-3 text-[15px] font-medium outline-none focus-visible:shadow-none"
               />
             </div>
           </label>
           <label className="flex flex-col gap-1.75">
-            <span className="text-[13px] font-semibold text-body">Email</span>
+            <span className="text-[13px] font-semibold text-body">{t.email}</span>
             <input
               value={form.email}
               onChange={set("email")}
               type="email"
               autoComplete="email"
-              placeholder="aap@gmail.com"
+              placeholder={t.emailPlaceholder}
               className={inputCls}
             />
           </label>
@@ -134,10 +131,11 @@ export function CheckoutForm({ price }: { price: string }) {
       </div>
 
       <div className="flex flex-col gap-2.5">
-        <span className="text-[15px] font-bold text-ink">Payment method</span>
+        <span className="text-[15px] font-bold text-ink">{t.paymentMethod}</span>
         <div className="grid gap-2.5 sm:grid-cols-3">
-          {METHODS.map((m) => {
-            const on = method === m.id;
+          {METHOD_IDS.map((id) => {
+            const m = { id, ...t.methods[id] };
+            const on = method === id;
             return (
               <button
                 key={m.id}
@@ -160,10 +158,10 @@ export function CheckoutForm({ price }: { price: string }) {
         {method === "upi" && (
           <div className="flex flex-col gap-2.5 rounded-xl border border-line bg-surface-muted p-4">
             <span className="text-[13.5px] leading-relaxed text-body">
-              Pay button dabane par GPay / PhonePe / Paytm app khulega ya QR code dikhega.
+              {t.upiNote}
             </span>
             <input
-              placeholder="UPI ID (optional) — jaise rahul@okaxis"
+              placeholder={t.upiPlaceholder}
               className="h-11.5 rounded-[10px] border border-line-strong bg-surface px-3.5 text-[14.5px] font-medium"
             />
           </div>
@@ -172,16 +170,16 @@ export function CheckoutForm({ price }: { price: string }) {
         {method === "card" && (
           <div className="grid gap-2.5 rounded-xl border border-line bg-surface-muted p-4 sm:grid-cols-2">
             <input
-              placeholder="Card number"
+              placeholder={t.cardNumber}
               inputMode="numeric"
               className="h-11.5 rounded-[10px] border border-line-strong bg-surface px-3.5 text-[14.5px] font-medium sm:col-span-2"
             />
             <input
-              placeholder="MM / YY"
+              placeholder={t.cardExpiry}
               className="h-11.5 rounded-[10px] border border-line-strong bg-surface px-3.5 text-[14.5px] font-medium"
             />
             <input
-              placeholder="CVV"
+              placeholder={t.cardCvv}
               inputMode="numeric"
               className="h-11.5 rounded-[10px] border border-line-strong bg-surface px-3.5 text-[14.5px] font-medium"
             />
@@ -194,7 +192,7 @@ export function CheckoutForm({ price }: { price: string }) {
               defaultValue=""
               className="h-11.5 w-full rounded-[10px] border border-line-strong bg-surface px-3 text-[14.5px] font-medium text-ink"
             >
-              <option value="">Apna bank chunein</option>
+              <option value="">{t.chooseBank}</option>
               {BANKS.map((b) => (
                 <option key={b}>{b}</option>
               ))}
@@ -214,13 +212,12 @@ export function CheckoutForm({ price }: { price: string }) {
         disabled={busy}
         className="rounded-xl bg-brand px-5.5 py-4.25 text-base font-bold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {busy ? "Processing..." : `Pay ₹${price} securely`}
+        {busy ? t.processing : fmt(t.payButton, { price })}
       </button>
 
       <span className="flex items-center justify-center gap-2 text-center text-[12.5px] font-medium leading-snug text-muted">
         <ShieldIcon size={14} className="shrink-0" />
-        Payment Razorpay/Cashfree ke secure gateway se hota hai. Card details hamare server par save
-        nahi hoti.
+        {t.secureNote}
       </span>
     </form>
   );
@@ -240,7 +237,7 @@ async function openRazorpay(
 ): Promise<{ paymentId: string; signature: string } | null> {
   await loadScript("https://checkout.razorpay.com/v1/checkout.js");
   const Razorpay = (window as unknown as { Razorpay?: RazorpayCtor }).Razorpay;
-  if (!Razorpay) throw new Error("Payment gateway load nahi hua. Internet check karein.");
+  if (!Razorpay) throw new Error("The payment gateway did not load. Please check your connection.");
 
   return new Promise((resolve) => {
     new Razorpay({

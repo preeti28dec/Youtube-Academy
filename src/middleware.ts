@@ -18,7 +18,7 @@ export function middleware(req: NextRequest) {
   // API calls ko HTML page bhejna bekaar hai — unhe saaf JSON milta hai.
   if (req.nextUrl.pathname.startsWith("/api/")) {
     return NextResponse.json(
-      { error: "Server abhi poori tarah configure nahi hai. /setup dekhein." },
+      { error: "The server is not fully configured yet. See /setup." },
       { status: 503 },
     );
   }

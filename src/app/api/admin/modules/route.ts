@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   const body = (await req.json().catch(() => null)) as { title?: string } | null;
   const title = (body?.title ?? "").trim();
-  if (!title) return NextResponse.json({ error: "Module title bharein." }, { status: 400 });
+  if (!title) return NextResponse.json({ error: "Enter a module title." }, { status: 400 });
 
   const course = await getCourse();
   if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
@@ -31,6 +31,25 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json({ ok: true, id: created.id });
+}
+
+/** Module ka naam badalna. */
+export async function PATCH(req: Request) {
+  try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Admin only" }, { status: 403 });
+  }
+
+  const body = (await req.json().catch(() => null)) as { id?: string; title?: string } | null;
+  const id = body?.id ?? "";
+  const title = (body?.title ?? "").trim();
+  if (!id || !title) {
+    return NextResponse.json({ error: "Module id and title are required." }, { status: 400 });
+  }
+
+  await prisma.module.update({ where: { id }, data: { title } });
+  return NextResponse.json({ ok: true });
 }
 
 /** Module delete — uske lessons bhi cascade se hat jaate hain. */

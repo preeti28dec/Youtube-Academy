@@ -30,7 +30,7 @@ export async function POST(req: Request) {
   const moduleId = body?.moduleId ?? "";
   const title = (body?.title ?? "").trim();
   if (!moduleId || !title) {
-    return NextResponse.json({ error: "Module aur lesson title zaroori hai." }, { status: 400 });
+    return NextResponse.json({ error: "Module and lesson title are required." }, { status: 400 });
   }
 
   const mod = await prisma.module.findUnique({ where: { id: moduleId }, select: { id: true } });
@@ -84,7 +84,7 @@ export async function PATCH(req: Request) {
   if (typeof body?.videoKey === "string") data.videoKey = body.videoKey.trim() || null;
 
   if (Object.keys(data).length === 0) {
-    return NextResponse.json({ error: "Kuch badla nahi." }, { status: 400 });
+    return NextResponse.json({ error: "Nothing to update." }, { status: 400 });
   }
 
   await prisma.lesson.update({ where: { id }, data });

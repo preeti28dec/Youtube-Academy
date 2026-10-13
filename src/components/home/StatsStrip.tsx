@@ -1,18 +1,20 @@
-import { STAT_LABELS } from "@/lib/site-content";
+import type { Dictionary } from "@/i18n";
 
 /** Hero ke neeche patti — numbers DB se aate hain, isliye hamesha sach rehte hain. */
 export function StatsStrip({
   lessonCount,
   totalDuration,
+  labels,
 }: {
   lessonCount: number;
   totalDuration: string;
+  labels: Dictionary["home"]["stats"];
 }) {
   const stats = [
-    { value: `${lessonCount}`, label: STAT_LABELS.lessons },
-    { value: totalDuration, label: STAT_LABELS.duration },
-    { value: "Lifetime", label: STAT_LABELS.access },
-    { value: "Direct", label: STAT_LABELS.support },
+    { value: `${lessonCount}`, label: labels.lessons },
+    { value: totalDuration, label: labels.duration },
+    { value: labels.lifetime, label: labels.access },
+    { value: labels.direct, label: labels.support },
   ];
 
   return (

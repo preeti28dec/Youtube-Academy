@@ -38,10 +38,10 @@ export function BootstrapForm() {
         body: JSON.stringify({ ...form, password }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Setup nahi hua.");
+      if (!res.ok) throw new Error(data.error ?? "Setup failed.");
       setDone({ password, modules: data.modules, lessons: data.lessons });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Setup nahi hua.");
+      setError(err instanceof Error ? err.message : "Setup failed.");
       setBusy(false);
     }
   }
@@ -50,11 +50,11 @@ export function BootstrapForm() {
     return (
       <div className="flex flex-col gap-3.5 rounded-xl border border-ok bg-ok-soft p-4.5">
         <span className="text-[15px] font-bold text-ok">
-          Ho gaya — {done.modules} modules, {done.lessons} lessons bann gaye.
+          Done — {done.modules} modules and {done.lessons} lessons created.
         </span>
         <div className="flex flex-col gap-1.5 rounded-[10px] border border-line bg-surface p-3.5">
           <span className="text-[13px] font-semibold text-body">
-            Admin password — <strong>abhi save kar lein</strong>, yeh dobara nahi dikhega
+            Admin password — <strong>save it now</strong>, it will not be shown again
           </span>
           <span className="font-mono text-[17px] font-semibold break-all text-ink">
             {done.password}
@@ -65,7 +65,7 @@ export function BootstrapForm() {
           href="/"
           className="rounded-xl bg-brand px-5 py-3.5 text-center text-[15px] font-bold text-white hover:bg-brand-dark"
         >
-          Site kholein
+          Open the site
         </a>
       </div>
     );
@@ -74,7 +74,7 @@ export function BootstrapForm() {
   return (
     <form onSubmit={submit} className="flex flex-col gap-3.5">
       <label className="flex flex-col gap-1.75">
-        <span className="text-[13px] font-semibold text-body">Admin ka naam</span>
+        <span className="text-[13px] font-semibold text-body">Admin name</span>
         <input value={form.name} onChange={set("name")} className={inputCls} />
       </label>
       <div className="grid gap-3.5 sm:grid-cols-2">
@@ -84,12 +84,12 @@ export function BootstrapForm() {
             value={form.email}
             onChange={set("email")}
             type="email"
-            placeholder="sohail@gmail.com"
+            placeholder="you@gmail.com"
             className={inputCls}
           />
         </label>
         <label className="flex flex-col gap-1.75">
-          <span className="text-[13px] font-semibold text-body">Mobile (10 digit)</span>
+          <span className="text-[13px] font-semibold text-body">Mobile (10 digits)</span>
           <input
             value={form.mobile}
             onChange={set("mobile")}
@@ -112,11 +112,11 @@ export function BootstrapForm() {
         disabled={busy}
         className="rounded-xl bg-brand px-5 py-4 text-base font-bold text-white hover:bg-brand-dark disabled:opacity-60"
       >
-        {busy ? "Ban raha hai..." : "Course aur admin account banayein"}
+        {busy ? "Creating..." : "Create course and admin account"}
       </button>
       <span className="text-[12.5px] leading-relaxed text-muted">
-        Password apne aap bann kar aapko ek baar dikhaya jayega. Yeh button sirf tab tak kaam
-        karta hai jab tak database bilkul khaali hai.
+        A password is generated for you and shown once. This button only works while the
+        database is completely empty.
       </span>
     </form>
   );

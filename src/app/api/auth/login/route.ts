@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const password = body?.password ?? "";
 
   if (!id || !password) {
-    return NextResponse.json({ error: "Email/mobile aur password bharein." }, { status: 400 });
+    return NextResponse.json({ error: "Enter your email/mobile and password." }, { status: 400 });
   }
 
   const mobile = normalizeMobile(id);
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   // Ek hi message dono case ke liye — attacker ko pata na chale ki
   // email exist karta hai ya nahi.
   const invalid = NextResponse.json(
-    { error: "Email/mobile ya password galat hai." },
+    { error: "That email/mobile or password is incorrect." },
     { status: 401 },
   );
 

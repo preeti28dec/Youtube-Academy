@@ -4,6 +4,7 @@ import { getCompletedLessonIds, getCourse, moduleDuration } from "@/lib/course";
 import { getCurrentUser, isEnrolled } from "@/lib/auth";
 import { CheckIcon, ChevronDownIcon, PlayIcon } from "@/components/icons";
 import { LogoutButton } from "@/components/LogoutButton";
+import { getDictionary, t } from "@/i18n";
 
 export const metadata = { title: "Mera course · Sohail YouTube Academy" };
 
@@ -17,6 +18,8 @@ export default async function DashboardPage() {
   // Bina payment dashboard nahi khulta.
   if (!(await isEnrolled(user.id, course.id))) redirect("/checkout");
 
+  const d = getDictionary();
+  const db = d.dashboard;
   const done = await getCompletedLessonIds(user.id);
   const allLessons = course.modules.flatMap((m) => m.lessons);
   const doneCount = allLessons.filter((l) => done.has(l.id)).length;
@@ -27,12 +30,12 @@ export default async function DashboardPage() {
     <div className="mx-auto flex w-full max-w-[1120px] flex-col gap-5.5 px-5 pt-9 pb-18">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-muted">Namaste, {user.name.split(" ")[0]}</span>
+          <span className="text-sm font-medium text-muted">{t(db.greeting, { name: user.name.split(" ")[0] })}</span>
           <h1 className="text-[clamp(24px,3.4vw,30px)] font-extrabold leading-[1.15] tracking-[-0.02em] text-ink">
-            Mera course
+            {db.title}
           </h1>
         </div>
-        <LogoutButton />
+        <LogoutButton label={d.nav.logout} />
       </div>
 
       {/* ---------- progress card ---------- */}
@@ -49,7 +52,7 @@ export default async function DashboardPage() {
             <span className="text-[13.5px] font-bold whitespace-nowrap text-ink">{pct}%</span>
           </div>
           <span className="text-[13px] font-medium text-muted">
-            {doneCount} / {allLessons.length} lessons complete
+            {t(db.progress, { done: doneCount, total: allLessons.length })}
           </span>
         </div>
         {next && (
@@ -57,7 +60,7 @@ export default async function DashboardPage() {
             href={`/learn/${next.id}`}
             className="flex flex-col gap-1.25 rounded-xl bg-brand px-5 py-3.75 text-[15px] font-bold text-white transition-colors hover:bg-brand-dark"
           >
-            <span>Continue learning</span>
+            <span>{db.continue}</span>
             <span className="text-[12.5px] font-medium text-[#d6d8fa]">{next.title}</span>
           </Link>
         )}
@@ -85,7 +88,7 @@ export default async function DashboardPage() {
                 <span className="flex min-w-0 flex-1 flex-col gap-1.25">
                   <span className="text-[15.5px] font-bold leading-snug text-ink">{m.title}</span>
                   <span className="text-[12.5px] font-medium text-muted">
-                    {moduleDone} / {m.lessons.length} complete · {moduleDuration(m)}
+                    {t(db.moduleProgress, { done: moduleDone, total: m.lessons.length, duration: moduleDuration(m) })}
                   </span>
                 </span>
                 <ChevronDownIcon
@@ -120,7 +123,7 @@ export default async function DashboardPage() {
                   );
                 })}
                 {m.lessons.length === 0 && (
-                  <p className="px-5 py-4 text-sm text-muted">Is module mein abhi koi lesson nahi.</p>
+                  <p className="px-5 py-4 text-sm text-muted">{db.emptyModule}</p>
                 )}
               </div>
             </details>

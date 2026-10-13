@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function LogoutButton() {
+export function LogoutButton({ label }: { label: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
@@ -19,7 +19,7 @@ export function LogoutButton() {
       }}
       className="rounded-[10px] border border-line-strong bg-surface px-3.5 py-2.5 text-[13.5px] font-semibold text-body transition-colors hover:bg-[#f7f8fa] disabled:opacity-60"
     >
-      Logout
+      {label}
     </button>
   );
 }

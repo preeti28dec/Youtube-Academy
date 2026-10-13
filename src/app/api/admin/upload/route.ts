@@ -35,9 +35,9 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error:
-          "Is hosting par file upload nahi ho sakti (serverless par disk nahi hota). " +
-          "Video apne video host (Bunny / VdoCipher / S3) par upload karein aur " +
-          "uska URL lesson ke video field mein paste kar dein.",
+          "File upload is not available on this hosting (serverless has no disk). " +
+          "Upload the video to your video host (Bunny / VdoCipher / S3) and paste " +
+          "its URL into the lesson's video field.",
       },
       { status: 501 },
     );
@@ -46,16 +46,16 @@ export async function POST(req: Request) {
   const form = await req.formData().catch(() => null);
   const file = form?.get("file");
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "Koi file nahi mili." }, { status: 400 });
+    return NextResponse.json({ error: "No file received." }, { status: 400 });
   }
   if (file.size === 0) {
-    return NextResponse.json({ error: "File khaali hai." }, { status: 400 });
+    return NextResponse.json({ error: "The file is empty." }, { status: 400 });
   }
   if (file.size > MAX_BYTES) {
-    return NextResponse.json({ error: "File 500 MB se badi hai." }, { status: 413 });
+    return NextResponse.json({ error: "The file is larger than 500 MB." }, { status: 413 });
   }
   if (!ALLOWED.has(file.type)) {
-    return NextResponse.json({ error: "Sirf mp4 / webm / mov allowed hai." }, { status: 415 });
+    return NextResponse.json({ error: "Only mp4 / webm / mov are allowed." }, { status: 415 });
   }
 
   // Naam hum khud banate hain — upload kiya hua naam path ya extension

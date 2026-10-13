@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { getDictionary } from "@/i18n";
 import { LoginForm } from "./LoginForm";
 
 export const metadata = { title: "Student login · Sohail YouTube Academy" };
@@ -10,7 +11,7 @@ export default async function LoginPage() {
 
   return (
     <div className="mx-auto w-full max-w-[440px] px-5 pt-14 pb-20">
-      <LoginForm />
+      <LoginForm t={getDictionary().login} />
     </div>
   );
 }

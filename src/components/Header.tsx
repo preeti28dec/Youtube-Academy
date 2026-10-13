@@ -5,34 +5,45 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { MenuIcon, PlayIcon } from "./icons";
 import type { SessionUser } from "@/lib/auth";
+import type { Dictionary } from "@/i18n";
 
 type NavItem = { href: string; label: string };
 
-export function Header({ user }: { user: SessionUser | null }) {
+export function Header({
+  user,
+  nav: t,
+  siteName,
+  tagline,
+}: {
+  user: SessionUser | null;
+  nav: Dictionary["nav"];
+  siteName: string;
+  tagline: string;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   // Home par anchors (woh saare sections wahin hain); baaki pages par
-  // seedha /course ka link, kyunki anchor sirf landing par kaam karega.
+  // seedha link, kyunki anchor sirf landing par kaam karega.
   const onHome = pathname === "/";
   const nav: NavItem[] = onHome
     ? [
-        { href: "#course", label: "Course" },
-        { href: "#curriculum", label: "Curriculum" },
-        { href: "#mentor", label: "Mentor" },
-        { href: "#faqs", label: "FAQs" },
+        { href: "#course", label: t.course },
+        { href: "#curriculum", label: t.curriculum },
+        { href: "#mentor", label: t.mentor },
+        { href: "#faqs", label: t.faqs },
       ]
     : [
-        { href: "/", label: "Home" },
-        { href: "/course", label: "Course Details" },
+        { href: "/", label: t.home },
+        { href: "/course", label: t.courseDetails },
       ];
 
-  nav.push(user ? { href: "/dashboard", label: "My Course" } : { href: "/login", label: "Login" });
-  if (user?.role === "admin") nav.push({ href: "/admin", label: "Admin" });
+  nav.push(user ? { href: "/dashboard", label: t.myCourse } : { href: "/login", label: t.login });
+  if (user?.role === "admin") nav.push({ href: "/admin", label: t.admin });
 
   const cta = user
-    ? { href: "/dashboard", label: "My Course" }
-    : { href: "/checkout", label: "Enroll Now" };
+    ? { href: "/dashboard", label: t.myCourse }
+    : { href: "/checkout", label: t.enrollNow };
 
   const linkColor = (href: string) =>
     pathname === href ? "text-brand" : "text-body hover:text-brand";
@@ -46,9 +57,9 @@ export function Header({ user }: { user: SessionUser | null }) {
           </span>
           <span className="flex flex-col items-start gap-[3px]">
             <span className="text-[15px] font-extrabold tracking-[-0.01em] text-ink">
-              Sohail YouTube Academy
+              {siteName}
             </span>
-            <span className="text-[11px] font-medium text-muted">Learn. Create. Grow.</span>
+            <span className="text-[11px] font-medium text-muted">{tagline}</span>
           </span>
         </Link>
 
@@ -72,7 +83,7 @@ export function Header({ user }: { user: SessionUser | null }) {
 
         <button
           type="button"
-          aria-label="Menu"
+          aria-label={t.menu}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
           className="flex h-11 w-11 items-center justify-center rounded-[10px] border border-line-strong bg-surface text-ink md:hidden"

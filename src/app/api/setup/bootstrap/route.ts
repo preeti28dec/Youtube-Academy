@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   const [users, courses] = await Promise.all([prisma.user.count(), prisma.course.count()]);
   if (users > 0 || courses > 0) {
     return NextResponse.json(
-      { error: "Setup pehle ho chuka hai. Yeh sirf bilkul khaali database par chalta hai." },
+      { error: "Setup has already run. This only works on a completely empty database." },
       { status: 409 },
     );
   }
@@ -40,13 +40,13 @@ export async function POST(req: Request) {
 
   if (!isValidEmail(email) || !mobile) {
     return NextResponse.json(
-      { error: "Sahi email aur 10-digit mobile number bharein." },
+      { error: "Enter a valid email and a 10-digit mobile number." },
       { status: 400 },
     );
   }
   if (password.length < 12) {
     return NextResponse.json(
-      { error: "Password kam se kam 12 characters ka hona chahiye." },
+      { error: "The password must be at least 12 characters." },
       { status: 400 },
     );
   }

@@ -16,14 +16,14 @@ export async function sendWelcomeMessage(args: {
 }): Promise<void> {
   const lines = [
     `To: ${args.email} / +91 ${args.mobile}`,
-    `Subject: ${args.courseTitle} — aapka account taiyaar hai`,
+    `Subject: ${args.courseTitle} — your account is ready`,
     ``,
-    `Namaste ${args.name},`,
-    `Payment successful. Login details:`,
+    `Hi ${args.name},`,
+    `Payment successful. Your login details:`,
     `  Login ID : ${args.email}`,
     `  Password : ${args.password}`,
-    `Login karein aur password badal lein.`,
-    `Koi dikkat ho to WhatsApp: +${env.whatsappNumber}`,
+    `Log in and change this password.`,
+    `Any trouble? WhatsApp us: +${env.whatsappNumber}`,
   ];
   console.log("\n[notify] ----- welcome message -----\n" + lines.join("\n") + "\n");
 }

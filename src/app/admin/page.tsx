@@ -5,14 +5,13 @@ import { getCourse } from "@/lib/course";
 import { getCurrentUser } from "@/lib/auth";
 import { formatMobile } from "@/lib/format";
 import { AdminContent } from "./AdminContent";
+import { CourseInfoForm } from "./CourseInfoForm";
 import { LogoutButton } from "@/components/LogoutButton";
+import { getDictionary, t } from "@/i18n";
 
 export const metadata = { title: "Admin · Sohail YouTube Academy" };
 
-const TABS = [
-  { id: "content", label: "Course content" },
-  { id: "students", label: "Students" },
-] as const;
+const TAB_IDS = ["content", "students"] as const;
 
 export default async function AdminPage({
   searchParams,
@@ -24,6 +23,8 @@ export default async function AdminPage({
   // Admin ke alawa koi yahan na pahunche.
   if (user.role !== "admin") redirect("/dashboard");
 
+  const dict = getDictionary();
+  const a = dict.admin;
   const { tab, q } = await searchParams;
   const activeTab = tab === "students" ? "students" : "content";
   const search = (q ?? "").trim();
@@ -41,10 +42,10 @@ export default async function AdminPage({
   ]);
 
   const stats = [
-    { label: "Total students", value: String(totalStudents) },
-    { label: "Is mahine", value: String(thisMonth) },
-    { label: "Modules", value: String(course.moduleCount) },
-    { label: "Lessons", value: String(course.lessonCount) },
+    { label: a.stats.totalStudents, value: String(totalStudents) },
+    { label: a.stats.thisMonth, value: String(thisMonth) },
+    { label: a.stats.modules, value: String(course.moduleCount) },
+    { label: a.stats.lessons, value: String(course.lessonCount) },
   ];
 
   return (
@@ -52,32 +53,32 @@ export default async function AdminPage({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1.5">
           <span className="text-[11px] font-semibold tracking-[0.09em] uppercase text-faint">
-            Admin panel
+            {a.eyebrow}
           </span>
           <h1 className="text-[clamp(24px,3.4vw,30px)] font-extrabold leading-[1.15] tracking-[-0.02em] text-ink">
-            Course management
+            {a.title}
           </h1>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex gap-1 rounded-[11px] bg-fill p-1">
-            {TABS.map((t) => {
-              const on = activeTab === t.id;
+            {TAB_IDS.map((id) => {
+              const on = activeTab === id;
               return (
                 <Link
-                  key={t.id}
-                  href={`/admin?tab=${t.id}`}
+                  key={id}
+                  href={`/admin?tab=${id}`}
                   className={`rounded-lg px-4 py-2.5 text-[13.5px] font-semibold ${
                     on
                       ? "bg-surface text-ink shadow-[0_1px_2px_rgba(20,24,33,.08)]"
                       : "text-body hover:text-ink"
                   }`}
                 >
-                  {t.label}
+                  {a.tabs[id]}
                 </Link>
               );
             })}
           </div>
-          <LogoutButton />
+          <LogoutButton label={dict.nav.logout} />
         </div>
       </div>
 
@@ -98,15 +99,33 @@ export default async function AdminPage({
       </div>
 
       {activeTab === "content" ? (
-        <AdminContent modules={course.modules} />
+        <div className="flex flex-col gap-5">
+          <CourseInfoForm
+            initial={{
+              title: course.title,
+              subtitle: course.subtitle,
+              description: course.description,
+              priceRupees: Math.round(course.pricePaise / 100),
+            }}
+          />
+          <AdminContent modules={course.modules} t={a} />
+        </div>
       ) : (
-        <StudentsTable courseId={course.id} search={search} />
+        <StudentsTable courseId={course.id} search={search} t={a} />
       )}
     </div>
   );
 }
 
-async function StudentsTable({ courseId, search }: { courseId: string; search: string }) {
+async function StudentsTable({
+  courseId,
+  search,
+  t: a,
+}: {
+  courseId: string;
+  search: string;
+  t: ReturnType<typeof getDictionary>["admin"];
+}) {
   const totalLessons = await prisma.lesson.count({ where: { module: { courseId } } });
 
   const enrollments = await prisma.enrollment.findMany({
@@ -143,7 +162,7 @@ async function StudentsTable({ courseId, search }: { courseId: string; search: s
     name: e.user.name,
     email: e.user.email,
     mobile: formatMobile(e.user.mobile),
-    date: e.createdAt.toLocaleDateString("en-IN", {
+    date: e.createdAt.toLocaleDateString("en-GB", {
       day: "2-digit",
       month: "short",
       year: "numeric",
@@ -154,21 +173,21 @@ async function StudentsTable({ courseId, search }: { courseId: string; search: s
   return (
     <div className="overflow-hidden rounded-[14px] border border-line bg-surface">
       <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-line px-4.5 py-3.5">
-        <span className="text-[15px] font-bold text-ink">Students</span>
+        <span className="text-[15px] font-bold text-ink">{a.students}</span>
         {/* GET form — search URL mein rehta hai, isliye link share/bookmark ho sakta hai. */}
         <form method="GET" action="/admin" className="flex min-w-0 flex-[0_1_320px] gap-2">
           <input type="hidden" name="tab" value="students" />
           <input
             name="q"
             defaultValue={search}
-            placeholder="Naam, email ya mobile se search"
+            placeholder={a.searchPlaceholder}
             className="h-10 min-w-0 flex-1 rounded-[9px] border border-line-strong bg-surface px-3 text-[13.5px] font-medium"
           />
           <button
             type="submit"
             className="rounded-[9px] border border-line-strong bg-surface px-3 text-[13px] font-semibold text-body hover:bg-[#f7f8fa]"
           >
-            Search
+            {a.search}
           </button>
         </form>
       </div>
@@ -176,11 +195,11 @@ async function StudentsTable({ courseId, search }: { courseId: string; search: s
       <div className="overflow-x-auto">
         <div className="min-w-[720px]">
           <div className="grid grid-cols-[1.3fr_1fr_1.6fr_0.9fr_1.2fr] gap-3 border-b border-line bg-surface-muted px-4.5 py-2.75 text-[10.5px] font-semibold tracking-[0.09em] uppercase text-faint">
-            <span>Name</span>
-            <span>Mobile</span>
-            <span>Email</span>
-            <span>Enrolled</span>
-            <span>Progress</span>
+            <span>{a.table.name}</span>
+            <span>{a.table.mobile}</span>
+            <span>{a.table.email}</span>
+            <span>{a.table.enrolled}</span>
+            <span>{a.table.progress}</span>
           </div>
 
           {rows.map((s) => (
@@ -203,7 +222,7 @@ async function StudentsTable({ courseId, search }: { courseId: string; search: s
 
           {rows.length === 0 && (
             <p className="px-4.5 py-6 text-sm text-muted">
-              {search ? `"${search}" se koi student nahi mila.` : "Abhi koi student enrolled nahi."}
+              {search ? t(a.noStudentsSearch, { q: search }) : a.noStudents}
             </p>
           )}
         </div>

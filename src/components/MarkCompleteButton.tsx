@@ -6,9 +6,11 @@ import { useState, useTransition } from "react";
 export function MarkCompleteButton({
   lessonId,
   initialDone,
+  labels,
 }: {
   lessonId: string;
   initialDone: boolean;
+  labels: { done: string; todo: string };
 }) {
   const router = useRouter();
   const [done, setDone] = useState(initialDone);
@@ -44,7 +46,7 @@ export function MarkCompleteButton({
           : "border border-ok bg-ok text-white hover:brightness-95"
       }`}
     >
-      {done ? "✓ Completed" : "Mark as complete"}
+      {done ? labels.done : labels.todo}
     </button>
   );
 }

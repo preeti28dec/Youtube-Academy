@@ -39,7 +39,7 @@ export async function GET(req: Request) {
   const payload = verifyVideoToken(token);
   if (!payload) {
     return NextResponse.json(
-      { error: "Link expire ho gaya. Page refresh karein." },
+      { error: "This link has expired. Refresh the page." },
       { status: 403 },
     );
   }
@@ -48,7 +48,7 @@ export async function GET(req: Request) {
   const user = await getCurrentUser();
   const currentId = user?.id ?? "guest";
   if (payload.userId !== currentId) {
-    return NextResponse.json({ error: "Yeh link aapke account ka nahi hai." }, { status: 403 });
+    return NextResponse.json({ error: "This link does not belong to your account." }, { status: 403 });
   }
 
   const lesson = await prisma.lesson.findUnique({
@@ -59,7 +59,7 @@ export async function GET(req: Request) {
   const source = parseVideoSource(lesson?.videoKey ?? null);
   if (!source) {
     return NextResponse.json(
-      { error: "Is lesson ki video abhi upload nahi hui." },
+      { error: "No video has been added to this lesson yet." },
       { status: 404 },
     );
   }
@@ -99,7 +99,7 @@ async function streamFromDisk(name: string, range: string | null) {
   } catch {
     return NextResponse.json(
       {
-        error: `Video file nahi mili: media/${name}. Koi bhi mp4 isi naam se rakh dein, ya admin panel se video ka URL daal dein.`,
+        error: `Video file not found: media/${name}. Put any mp4 there with that name, or paste a video URL in the admin panel.`,
       },
       { status: 404 },
     );
@@ -147,20 +147,20 @@ async function streamFromUrl(url: string, range: string | null) {
     });
   } catch {
     return NextResponse.json(
-      { error: "Video host se connect nahi ho paaya. Thodi der baad try karein." },
+      { error: "Could not reach the video host. Please try again shortly." },
       { status: 502 },
     );
   }
 
   if (upstream.status >= 300 && upstream.status < 400) {
     return NextResponse.json(
-      { error: "Video host redirect kar raha hai. Admin panel mein seedha file ka URL daalein." },
+      { error: "The video host is redirecting. Use the direct file URL in the admin panel." },
       { status: 502 },
     );
   }
   if (!upstream.ok && upstream.status !== 206) {
     return NextResponse.json(
-      { error: `Video host ne ${upstream.status} diya.` },
+      { error: `The video host returned ${upstream.status}.` },
       { status: 502 },
     );
   }

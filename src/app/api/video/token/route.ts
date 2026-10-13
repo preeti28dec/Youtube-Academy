@@ -29,13 +29,13 @@ export async function POST(req: Request) {
   const user = await getCurrentUser();
 
   if (!lesson.isFree) {
-    if (!user) return NextResponse.json({ error: "Login karein." }, { status: 401 });
+    if (!user) return NextResponse.json({ error: "Please log in." }, { status: 401 });
     const enrolled = await prisma.enrollment.findUnique({
       where: { userId_courseId: { userId: user.id, courseId: lesson.module.courseId } },
       select: { id: true },
     });
     if (!enrolled) {
-      return NextResponse.json({ error: "Yeh lesson khareedne ke baad khulega." }, { status: 403 });
+      return NextResponse.json({ error: "This lesson opens after you buy the course." }, { status: 403 });
     }
   }
 

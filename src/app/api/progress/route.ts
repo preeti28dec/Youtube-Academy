@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 /** Lesson complete / incomplete toggle. */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Login karein." }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Please log in." }, { status: 401 });
 
   const body = (await req.json().catch(() => null)) as {
     lessonId?: string;
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     where: { userId_courseId: { userId: user.id, courseId: lesson.module.courseId } },
     select: { id: true },
   });
-  if (!enrolled) return NextResponse.json({ error: "Enrolled nahi hain." }, { status: 403 });
+  if (!enrolled) return NextResponse.json({ error: "You are not enrolled in this course." }, { status: 403 });
 
   await prisma.progress.upsert({
     where: { userId_lessonId: { userId: user.id, lessonId } },

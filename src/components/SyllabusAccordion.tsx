@@ -1,5 +1,6 @@
 import { moduleDuration, type ModuleRow } from "@/lib/course";
 import { ChevronDownIcon, LockIcon, PlayIcon } from "./icons";
+import { getDictionary, t } from "@/i18n";
 
 /**
  * Public syllabus list (Course Details page).
@@ -13,6 +14,8 @@ export function SyllabusAccordion({
   modules: ModuleRow[];
   defaultOpenFirst?: boolean;
 }) {
+  const c = getDictionary().course;
+
   return (
     <div className="flex flex-col gap-3">
       {modules.map((m, i) => (
@@ -28,7 +31,7 @@ export function SyllabusAccordion({
             <span className="flex min-w-0 flex-1 flex-col gap-1.25">
               <span className="text-[15.5px] font-bold leading-snug text-ink">{m.title}</span>
               <span className="text-[12.5px] font-medium text-muted">
-                {m.lessons.length} lessons · {moduleDuration(m)}
+                {t(c.lessonsCount, { count: m.lessons.length })} · {moduleDuration(m)}
               </span>
             </span>
             <ChevronDownIcon
@@ -53,7 +56,7 @@ export function SyllabusAccordion({
                 </span>
                 {l.isFree && (
                   <span className="shrink-0 rounded-md bg-ok-soft px-2 py-1 text-[11px] font-semibold text-ok">
-                    Free preview
+                    {c.freePreview}
                   </span>
                 )}
                 <span className="shrink-0 font-mono text-[12.5px] font-medium text-muted">
@@ -62,7 +65,7 @@ export function SyllabusAccordion({
               </div>
             ))}
             {m.lessons.length === 0 && (
-              <p className="px-5 py-4 text-[14px] text-muted">Is module mein abhi koi lesson nahi.</p>
+              <p className="px-5 py-4 text-[14px] text-muted">{c.emptyModule}</p>
             )}
           </div>
         </details>

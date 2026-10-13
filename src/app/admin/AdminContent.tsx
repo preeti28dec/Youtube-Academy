@@ -4,15 +4,24 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PencilIcon, TrashIcon, UploadIcon, VideoIcon } from "@/components/icons";
 import type { ModuleRow } from "@/lib/course";
+import { type Dictionary, t as fmt } from "@/i18n";
 
 const inputCls =
   "h-11 w-full rounded-[10px] border border-line-strong bg-surface px-3 text-sm font-medium text-ink placeholder:font-normal placeholder:text-muted";
 
 type Draft = { title: string; duration: string; isFree: boolean; videoKey: string };
 
-export function AdminContent({ modules }: { modules: ModuleRow[] }) {
+export function AdminContent({
+  modules,
+  t,
+}: {
+  modules: ModuleRow[];
+  t: Dictionary["admin"];
+}) {
   const router = useRouter();
   const [editing, setEditing] = useState<string | null>(null);
+  const [editingModule, setEditingModule] = useState<string | null>(null);
+  const [moduleTitle, setModuleTitle] = useState("");
   const [draft, setDraft] = useState<Draft>({
     title: "",
     duration: "",
@@ -40,10 +49,10 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
       fd.append("file", file);
       const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error ?? "Upload nahi hua.");
+      if (!res.ok) throw new Error(data.error ?? t.uploadFailed);
       setNewLesson((n) => ({ ...n, videoKey: data.videoKey }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload nahi hua.");
+      setError(err instanceof Error ? err.message : t.uploadFailed);
     } finally {
       setUploading(false);
     }
@@ -59,11 +68,11 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
         body: body ? JSON.stringify(body) : undefined,
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error ?? "Save nahi hua.");
+      if (!res.ok) throw new Error(data.error ?? t.saveFailed);
       router.refresh();
       return true;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Save nahi hua.");
+      setError(err instanceof Error ? err.message : t.saveFailed);
       return false;
     } finally {
       setBusy(false);
@@ -84,18 +93,62 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
           <div key={m.id} className="overflow-hidden rounded-[14px] border border-line bg-surface">
             <div className="flex items-center gap-3 border-b border-line bg-surface-muted px-4.5 py-3.5">
               <span className="text-[13px] font-bold text-muted">{m.position}</span>
-              <span className="min-w-0 flex-1 text-[15px] font-bold leading-snug text-ink">
-                {m.title}
-              </span>
+              {editingModule === m.id ? (
+                <>
+                  <input
+                    value={moduleTitle}
+                    onChange={(e) => setModuleTitle(e.target.value)}
+                    className="h-9 min-w-0 flex-1 rounded-[9px] border border-brand bg-surface px-2.5 text-[15px] font-semibold shadow-[0_0_0_3px_var(--color-brand-soft)]"
+                  />
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={async () => {
+                      const ok = await call("/api/admin/modules", "PATCH", {
+                        id: m.id,
+                        title: moduleTitle,
+                      });
+                      if (ok) setEditingModule(null);
+                    }}
+                    className="rounded-[9px] bg-brand px-3 py-2 text-[13px] font-semibold text-white"
+                  >
+                    {t.save}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingModule(null)}
+                    className="rounded-[9px] border border-line-strong bg-surface px-2.5 py-1.75 text-[13px] font-semibold text-body"
+                  >
+                    {t.cancel}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span className="min-w-0 flex-1 text-[15px] font-bold leading-snug text-ink">
+                    {m.title}
+                  </span>
+                  <button
+                    type="button"
+                    title={t.edit}
+                    onClick={() => {
+                      setEditingModule(m.id);
+                      setModuleTitle(m.title);
+                    }}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-line-strong bg-surface text-muted hover:border-transparent hover:bg-brand-soft hover:text-brand"
+                  >
+                    <PencilIcon size={14} />
+                  </button>
+                </>
+              )}
               <span className="text-[12.5px] font-medium whitespace-nowrap text-muted">
-                {m.lessons.length} lessons
+                {fmt(t.lessonsCount, { count: m.lessons.length })}
               </span>
               <button
                 type="button"
-                title="Delete module"
+                title={t.deleteModule}
                 disabled={busy}
                 onClick={() => {
-                  if (!window.confirm(`"${m.title}" aur uske saare lessons delete karein?`)) return;
+                  if (!window.confirm(fmt(t.deleteModuleConfirm, { title: m.title }))) return;
                   void call(`/api/admin/modules?id=${encodeURIComponent(m.id)}`, "DELETE");
                 }}
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-line-strong bg-surface text-muted hover:border-transparent hover:bg-danger-soft hover:text-danger"
@@ -113,19 +166,19 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
                   <input
                     value={draft.title}
                     onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                    placeholder="Lesson title"
+                    placeholder={t.lessonTitle}
                     className="h-10 flex-[1_1_200px] rounded-[9px] border border-brand bg-surface px-3 text-sm font-medium shadow-[0_0_0_3px_var(--color-brand-soft)]"
                   />
                   <input
                     value={draft.duration}
                     onChange={(e) => setDraft({ ...draft, duration: e.target.value })}
-                    placeholder="mm:ss"
+                    placeholder={t.duration}
                     className="h-10 w-24 rounded-[9px] border border-line-strong bg-surface px-3 text-sm font-medium"
                   />
                   <input
                     value={draft.videoKey}
                     onChange={(e) => setDraft({ ...draft, videoKey: e.target.value })}
-                    placeholder="Video URL ya file name"
+                    placeholder={t.videoField}
                     className="h-10 w-40 rounded-[9px] border border-line-strong bg-surface px-3 text-sm font-medium"
                   />
                   <label className="flex items-center gap-1.5 text-[13px] font-medium text-body">
@@ -135,7 +188,7 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
                       onChange={(e) => setDraft({ ...draft, isFree: e.target.checked })}
                       className="h-4 w-4 accent-brand"
                     />
-                    Free
+                    {t.free}
                   </label>
                   <button
                     type="button"
@@ -146,14 +199,14 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
                     }}
                     className="rounded-[9px] bg-brand px-3.5 py-2.75 text-[13px] font-semibold text-white hover:bg-brand-dark"
                   >
-                    Save
+                    {t.save}
                   </button>
                   <button
                     type="button"
                     onClick={() => setEditing(null)}
                     className="rounded-[9px] border border-line-strong bg-surface px-3 py-2.5 text-[13px] font-semibold text-body"
                   >
-                    Cancel
+                    {t.cancel}
                   </button>
                 </div>
               ) : (
@@ -168,12 +221,12 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
                   <span className="font-mono text-xs font-medium text-muted">{l.duration}</span>
                   {l.isFree && (
                     <span className="rounded-md bg-ok-soft px-1.75 py-1 text-[10.5px] font-semibold text-ok">
-                      Free
+                      {t.free}
                     </span>
                   )}
                   <button
                     type="button"
-                    title="Edit"
+                    title={t.edit}
                     onClick={() => {
                       setEditing(l.id);
                       setDraft({
@@ -189,10 +242,10 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
                   </button>
                   <button
                     type="button"
-                    title="Delete"
+                    title={t.delete}
                     disabled={busy}
                     onClick={() => {
-                      if (!window.confirm(`"${l.title}" delete karein?`)) return;
+                      if (!window.confirm(fmt(t.deleteLessonConfirm, { title: l.title }))) return;
                       void call(`/api/admin/lessons?id=${encodeURIComponent(l.id)}`, "DELETE");
                     }}
                     className="flex h-8 w-8 items-center justify-center rounded-lg border border-line-strong bg-surface text-muted hover:border-transparent hover:bg-danger-soft hover:text-danger"
@@ -204,7 +257,7 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
             )}
 
             {m.lessons.length === 0 && (
-              <p className="px-4.5 py-3.5 text-sm text-muted">Is module mein abhi koi lesson nahi.</p>
+              <p className="px-4.5 py-3.5 text-sm text-muted">{t.emptyModule}</p>
             )}
           </div>
         ))}
@@ -213,7 +266,7 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
       {/* ---------- add forms ---------- */}
       <div className="flex flex-[1_1_300px] flex-col gap-3.5">
         <div className="flex flex-col gap-3 rounded-[14px] border border-line bg-surface p-4.5">
-          <span className="text-[15px] font-bold text-ink">Naya lesson add karein</span>
+          <span className="text-[15px] font-bold text-ink">{t.addLesson}</span>
           <select
             value={newLesson.moduleId}
             onChange={(e) => setNewLesson({ ...newLesson, moduleId: e.target.value })}
@@ -228,31 +281,31 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
           <input
             value={newLesson.title}
             onChange={(e) => setNewLesson({ ...newLesson, title: e.target.value })}
-            placeholder="Lesson title"
+            placeholder={t.lessonTitle}
             className={inputCls}
           />
           <input
             value={newLesson.duration}
             onChange={(e) => setNewLesson({ ...newLesson, duration: e.target.value })}
-            placeholder="Duration (mm:ss)"
+            placeholder={t.duration}
             className={inputCls}
           />
           <input
             value={newLesson.videoKey}
             onChange={(e) => setNewLesson({ ...newLesson, videoKey: e.target.value })}
-            placeholder="Video URL ya file name"
+            placeholder={t.videoField}
             className={inputCls}
           />
           <label className="flex cursor-pointer flex-col items-center gap-1.5 rounded-[10px] border-[1.5px] border-dashed border-line-strong bg-surface-muted p-4.5 text-center hover:border-brand">
             <UploadIcon size={20} className="text-muted" />
             <span className="text-[13px] font-semibold leading-snug text-body">
-              {uploading ? "Upload ho raha hai..." : "Video upload karein"}
+              {uploading ? t.uploading : t.uploadVideo}
             </span>
             <span className="text-[11.5px] font-medium leading-snug text-muted">
-              MP4 / WebM / MOV · max 500 MB
+              {t.uploadHint}
             </span>
             <span className="text-[11.5px] font-medium leading-snug text-muted">
-              Ya upar wale field mein seedha video ka URL paste kar dein
+              {t.urlHint}
             </span>
             <input
               type="file"
@@ -273,7 +326,7 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
               onChange={(e) => setNewLesson({ ...newLesson, isFree: e.target.checked })}
               className="h-4 w-4 accent-brand"
             />
-            Free preview lesson
+            {t.freePreviewLesson}
           </label>
           <button
             type="button"
@@ -284,16 +337,16 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
             }}
             className="rounded-[10px] bg-brand px-4 py-3.25 text-sm font-semibold text-white hover:bg-brand-dark disabled:opacity-60"
           >
-            + Lesson add karein
+            {t.addLessonBtn}
           </button>
         </div>
 
         <div className="flex flex-col gap-3 rounded-[14px] border border-line bg-surface p-4.5">
-          <span className="text-[15px] font-bold text-ink">Naya module</span>
+          <span className="text-[15px] font-bold text-ink">{t.newModule}</span>
           <input
             value={newModule}
             onChange={(e) => setNewModule(e.target.value)}
-            placeholder="Module title"
+            placeholder={t.moduleTitle}
             className={inputCls}
           />
           <button
@@ -305,7 +358,7 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
             }}
             className="rounded-[10px] border border-line-strong bg-surface px-4 py-3 text-sm font-semibold text-ink hover:bg-[#f7f8fa] disabled:opacity-60"
           >
-            + Module add karein
+            {t.addModuleBtn}
           </button>
         </div>
       </div>

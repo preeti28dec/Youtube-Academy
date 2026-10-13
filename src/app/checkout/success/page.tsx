@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { formatMobile } from "@/lib/format";
+import { getDictionary, t } from "@/i18n";
 import { CheckIcon } from "@/components/icons";
 
 export const metadata = { title: "Payment successful · Sohail YouTube Academy" };
@@ -27,6 +28,7 @@ export default async function SuccessPage({
 
   // Verify route ne pehla password one-time cookie mein rakha tha.
   // Padh ke turant delete — refresh par dobara nahi dikhega.
+  const d = getDictionary().success;
   const jar = await cookies();
   const tempPassword = jar.get("sya_welcome_pw")?.value ?? null;
   if (tempPassword) jar.delete("sya_welcome_pw");
@@ -38,24 +40,23 @@ export default async function SuccessPage({
           <CheckIcon size={30} strokeWidth={2.6} />
         </span>
         <h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-ink">
-          Payment successful!
+          {d.title}
         </h1>
         <p className="text-[15px] leading-relaxed text-body">
-          Welcome {user.name.split(" ")[0]}. Aapka student account ban gaya hai aur course unlock ho
-          gaya hai.
+          {t(d.welcome, { name: user.name.split(" ")[0] })}
         </p>
 
         <dl className="flex w-full flex-col gap-2.5 rounded-xl border border-line bg-surface-muted p-4 text-left text-sm font-medium">
           <div className="flex flex-wrap justify-between gap-3">
-            <dt className="text-muted">Login ID</dt>
+            <dt className="text-muted">{d.loginId}</dt>
             <dd className="font-semibold text-ink">{user.email}</dd>
           </div>
           <div className="flex flex-wrap justify-between gap-3">
-            <dt className="text-muted">Mobile</dt>
+            <dt className="text-muted">{d.mobile}</dt>
             <dd className="font-semibold text-ink">+91 {formatMobile(user.mobile)}</dd>
           </div>
           <div className="flex flex-wrap justify-between gap-3">
-            <dt className="text-muted">Order ID</dt>
+            <dt className="text-muted">{d.orderId}</dt>
             <dd className="font-mono text-[13px]">{order ? order.id : "—"}</dd>
           </div>
         </dl>
@@ -63,16 +64,16 @@ export default async function SuccessPage({
         {tempPassword ? (
           <div className="flex w-full flex-col gap-1.5 rounded-xl border border-brand bg-brand-soft p-4 text-left">
             <span className="text-[13px] font-semibold text-brand-dark">
-              Aapka pehla password — ise save kar lein
+              {d.passwordTitle}
             </span>
             <span className="font-mono text-[17px] font-semibold text-ink">{tempPassword}</span>
             <span className="text-[12.5px] leading-snug text-body">
-              Yahi password email aur WhatsApp par bhi bheja gaya hai. Login karke ise badal lein.
+              {d.passwordNote}
             </span>
           </div>
         ) : (
           <span className="text-[13.5px] leading-normal text-body">
-            Password set karne ka link aapke email aur WhatsApp par bhej diya gaya hai.
+            {d.emailedNote}
           </span>
         )}
 
@@ -80,7 +81,7 @@ export default async function SuccessPage({
           href="/dashboard"
           className="w-full rounded-xl bg-brand px-5.5 py-4 text-base font-bold text-white transition-colors hover:bg-brand-dark"
         >
-          Course shuru karein
+          {d.startCourse}
         </Link>
       </div>
     </div>

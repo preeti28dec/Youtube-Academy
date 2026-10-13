@@ -5,11 +5,12 @@ import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { getCurrentUser } from "@/lib/auth";
 import { env } from "@/lib/env";
+import { getDictionary } from "@/i18n";
 
 export const metadata: Metadata = {
   title: "Sohail YouTube Academy",
   description:
-    "YouTube Growth Masterclass — Hindi mein, mobile-friendly, lifetime access. Channel setup se monetization tak step-by-step.",
+    "YouTube Growth Masterclass — in Hindi, mobile-friendly, lifetime access. From channel setup to monetization, step by step.",
 };
 
 export const viewport: Viewport = {
@@ -28,9 +29,10 @@ export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
+  const d = getDictionary();
 
   return (
-    <html lang="hi">
+    <html lang="en">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -40,7 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body className="flex min-h-screen flex-col bg-page">
-        <Header user={user} />
+        <Header user={user} nav={d.nav} siteName={d.meta.siteName} tagline={d.meta.tagline} />
         <main className="flex-1">{children}</main>
         <Footer />
         <WhatsAppButton number={env.whatsappNumber} />

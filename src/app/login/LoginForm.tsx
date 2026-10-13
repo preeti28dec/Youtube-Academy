@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { Dictionary } from "@/i18n";
 
 const inputCls =
   "h-12 w-full rounded-[10px] border border-line-strong bg-surface px-3.5 text-[15px] font-medium text-ink placeholder:font-normal placeholder:text-muted";
 
-export function LoginForm() {
+export function LoginForm({ t }: { t: Dictionary["login"] }) {
   const router = useRouter();
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
@@ -25,12 +26,12 @@ export function LoginForm() {
         body: JSON.stringify({ id, password }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Login nahi hua.");
+      if (!res.ok) throw new Error(data.error ?? t.failed);
       // refresh() se layout ka server-side user state bhi update ho jaata hai.
       router.push(data.redirect ?? "/dashboard");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login nahi hua.");
+      setError(err instanceof Error ? err.message : t.failed);
       setBusy(false);
     }
   }
@@ -42,15 +43,13 @@ export function LoginForm() {
     >
       <div className="flex flex-col gap-1.5">
         <h1 className="text-[26px] font-extrabold leading-tight tracking-[-0.02em] text-ink">
-          Student login
+          {t.title}
         </h1>
-        <span className="text-[14.5px] leading-normal text-body">
-          Apne course tak pahunchne ke liye login karein.
-        </span>
+        <span className="text-[14.5px] leading-normal text-body">{t.lead}</span>
       </div>
 
       <label className="flex flex-col gap-1.75">
-        <span className="text-[13px] font-semibold text-body">Email ya mobile number</span>
+        <span className="text-[13px] font-semibold text-body">{t.idLabel}</span>
         <input
           value={id}
           onChange={(e) => {
@@ -58,16 +57,16 @@ export function LoginForm() {
             setError(null);
           }}
           autoComplete="username"
-          placeholder="aap@gmail.com / 98XXXXXXXX"
+          placeholder={t.idPlaceholder}
           className={inputCls}
         />
       </label>
 
       <label className="flex flex-col gap-1.75">
         <span className="flex justify-between text-[13px] font-semibold text-body">
-          <span>Password</span>
+          <span>{t.password}</span>
           <Link href="/login" className="font-semibold text-brand">
-            Password bhool gaye?
+            {t.forgot}
           </Link>
         </span>
         <input
@@ -94,13 +93,13 @@ export function LoginForm() {
         disabled={busy}
         className="rounded-xl bg-brand px-5.5 py-4 text-base font-bold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {busy ? "Login ho raha hai..." : "Login"}
+        {busy ? t.submitting : t.submit}
       </button>
 
       <span className="text-center text-[13.5px] font-medium leading-normal text-body">
-        Abhi tak course nahi liya?{" "}
+        {t.noCourse}{" "}
         <Link href="/checkout" className="font-semibold text-brand">
-          Enroll karein
+          {t.enrollLink}
         </Link>
       </span>
     </form>

@@ -12,49 +12,49 @@ export const SYLLABUS: [string, [string, string, boolean?][]][] = [
     "YouTube Basics & Channel Setup",
     [
       ["Course introduction", "06:12", true],
-      ["Channel ka niche kaise choose karein", "14:30"],
+      ["How to choose your niche", "14:30"],
       ["Channel setup: name, logo, banner", "18:05"],
-      ["YouTube Studio ka overview", "12:40"],
+      ["A tour of YouTube Studio", "12:40"],
     ],
   ],
   [
     "Content Planning & Research",
     [
-      ["Video ideas kaise dhundhein", "16:20"],
+      ["How to find video ideas", "16:20"],
       ["Keyword research tools", "19:45"],
       ["Competitor analysis", "13:10"],
     ],
   ],
   [
-    "Mobile se Shooting & Editing",
+    "Shooting & Editing on Mobile",
     [
       ["Mobile shooting setup", "15:00", true],
-      ["Lighting aur audio basics", "11:35"],
-      ["Mobile editing step-by-step", "24:50"],
-      ["Shorts kaise banayein", "17:15"],
+      ["Lighting and audio basics", "11:35"],
+      ["Mobile editing, step by step", "24:50"],
+      ["How to make Shorts", "17:15"],
     ],
   ],
   [
     "Thumbnail, Title & SEO",
     [
       ["Click-worthy thumbnails", "20:10"],
-      ["Title aur description likhna", "14:25"],
-      ["Tags, hashtags aur chapters", "10:55"],
+      ["Writing titles and descriptions", "14:25"],
+      ["Tags, hashtags and chapters", "10:55"],
     ],
   ],
   [
     "Growth & Audience",
     [
-      ["Upload schedule aur consistency", "09:40"],
-      ["YouTube Analytics samjhein", "21:30"],
-      ["Comments aur community se judna", "08:50"],
+      ["Upload schedule and consistency", "09:40"],
+      ["Understanding YouTube Analytics", "21:30"],
+      ["Engaging with comments and community", "08:50"],
     ],
   ],
   [
     "Monetization",
     [
-      ["YPP eligibility aur apply karna", "13:20"],
-      ["Sponsorship aur brand deals", "16:45"],
+      ["YPP eligibility and applying", "13:20"],
+      ["Sponsorships and brand deals", "16:45"],
       ["Affiliate income", "12:05"],
     ],
   ],
@@ -63,9 +63,9 @@ export const SYLLABUS: [string, [string, string, boolean?][]][] = [
 export const COURSE = {
   slug: "youtube-growth-masterclass",
   title: "YouTube Growth Masterclass",
-  subtitle: "Hindi mein · Mobile-friendly · Lifetime access",
+  subtitle: "In Hindi · Mobile-friendly · Lifetime access",
   description:
-    "Yeh course un logon ke liye hai jo YouTube channel shuru karna chahte hain ya apne existing channel ko grow karna chahte hain. Saari videos Hindi mein hain aur mobile par aaram se dekhi ja sakti hain. Course ke end tak aap khud video plan, shoot, edit aur publish kar payenge.",
+    "This course is for anyone who wants to start a YouTube channel, or grow the one they already have. Every video is in Hindi and watches comfortably on a phone. By the end you will be able to plan, shoot, edit and publish videos on your own.",
   pricePaise: 149900,
 };
 
