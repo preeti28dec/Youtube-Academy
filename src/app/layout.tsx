@@ -17,6 +17,15 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+/**
+ * Har page session aur DB par depend karta hai, isliye kuch bhi build ke waqt
+ * prerender nahi hona chahiye. Yeh layout config saare child routes par lagti
+ * hai — iske bina Next kabhi-kabhi page ko static maan kar build par hi DB
+ * query chala deta hai, jo hosting par (jahan DB abhi juda na ho) build tod
+ * deti hai.
+ */
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
 

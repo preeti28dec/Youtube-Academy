@@ -3,6 +3,7 @@ import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 import { env } from "./env";
 import { prisma } from "./prisma";
+import { dbConfigured } from "./db-url";
 
 const COOKIE = "sya_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 din
@@ -47,6 +48,10 @@ export async function destroySession(): Promise<void> {
 
 /** Har request par DB se fresh user — role/ban changes turant lagu hote hain. */
 export async function getCurrentUser(): Promise<SessionUser | null> {
+  // DB configure na ho to layout bhi render hona chahiye (setup page ke liye),
+  // isliye yahan throw karne ke bajaye "koi logged in nahi" maan lete hain.
+  if (!dbConfigured()) return null;
+
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   try {

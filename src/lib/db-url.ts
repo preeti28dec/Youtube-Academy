@@ -49,3 +49,23 @@ export function resolveDbUrl(): ResolvedDbUrl | null {
 export function isSupportedDbUrl(url: string): boolean {
   return SUPPORTED.some((p) => url.startsWith(p));
 }
+
+/**
+ * Kya DB chalne laayak configure hai?
+ *
+ * Middleware isi se decide karta hai ki asli site dikhani hai ya /setup page.
+ * Isse hosting par config adhoori hone par bhi deploy green rehta hai aur
+ * site khud bata deti hai ki kya baaki hai — crash ke bajaye.
+ */
+export function dbConfigured(): boolean {
+  const r = resolveDbUrl();
+  return Boolean(r && isSupportedDbUrl(r.url));
+}
+
+/** Setup page ko dikhane ke liye: kya kami hai. */
+export function dbConfigProblem(): "missing" | "bad-protocol" | null {
+  const r = resolveDbUrl();
+  if (!r) return "missing";
+  if (!isSupportedDbUrl(r.url)) return "bad-protocol";
+  return null;
+}

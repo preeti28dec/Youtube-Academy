@@ -1,5 +1,10 @@
 # Vercel par deploy
 
+> **Deploy ab fail nahi hoti.** DATABASE_URL na hone par bhi build pass ho jaati hai aur
+> site live ho jaati hai — har page par ek **/setup** screen dikhti hai jo batati hai ki
+> kaunsa environment variable baaki hai. DATABASE_URL set karte hi woh screen apne aap hat
+> jaati hai aur asli site chalne lagti hai.
+
 > **Chhota jawab:** app Vercel par chalta hai, lekin **do cheezein aapko deni padengi** —
 > ek Postgres database aur videos ke liye ek external host ka URL. SQLite aur disk par
 > rakhi files Vercel par kaam nahi karti (serverless par persistent disk hota hi nahi).
@@ -95,7 +100,7 @@ aaya, wahi toota hai.
 
 | Log mein | Matlab | Fix |
 | --- | --- | --- |
-| `DATABASE_URL set nahi hai` | Postgres abhi laga hi nahi | Step 1 aur 2 karein, phir redeploy |
+| `[build] setup adhoora` | DATABASE_URL nahi hai — build phir bhi pass hogi | site /setup page dikhayegi; step 1-2 karke redeploy |
 | `postgres ka URL nahi lag raha` | value quotes ke saath hai, ya SQLite ka `file:...` hai | quotes hata dein; postgres string daalein |
 | `Database tak pahunch nahi paaye` (P1001) | URL hai, connection nahi bana | password/host check karein; `?sslmode=require` lagayein |
 | `P3005` | DB mein tables pehle se hain | script khud baseline kar leti hai; na ho to niche dekhein |

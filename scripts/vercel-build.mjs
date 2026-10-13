@@ -38,6 +38,14 @@ function die(message) {
   process.exit(1);
 }
 
+/** Config adhoori hai — build chalti rahegi, site /setup page dikhayegi. */
+function warnAndSkip(message) {
+  console.log(`\n${YELLOW}${BOLD}[build] setup adhoora${RESET}\n${message}\n`);
+}
+
+/** DB jud gaya? Tabhi migrations chalte hain. */
+let dbReady = false;
+
 /** Password dikhaye bina batata hai ki value kaisi lag rahi hai. */
 function describe(raw) {
   const v = (raw ?? "").trim();
@@ -82,30 +90,23 @@ function describe(raw) {
     }
   }
 
+  // Config ki kami par build FAIL nahi karte — site deploy ho jaati hai aur
+  // /setup page khud bata deta hai ki kya daalna hai. Isse pehli baar deploy
+  // karte waqt red cross ke bajaye ek kaam karti site milti hai.
   if (!picked) {
-    die(
-      `${YELLOW}DATABASE_URL set nahi hai.${RESET}\n\n` +
-        "Yeh app Postgres ke bina chal nahi sakta (Vercel par SQLite kaam nahi karta —\n" +
-        "serverless par persistent disk hota hi nahi).\n\n" +
+    warnAndSkip(
+      `${YELLOW}DATABASE_URL set nahi hai — migrations skip kar rahe hain.${RESET}\n\n` +
+        "Site deploy ho jayegi, lekin har page par setup wala message dikhega\n" +
+        "jab tak database nahi jud jaata.\n\n" +
         "Karna kya hai:\n" +
-        "  1. Ek Postgres lein — Vercel ka Storage tab, ya Neon / Supabase (free tier kaafi hai).\n" +
-        "  2. Vercel > Settings > Environment Variables mein DATABASE_URL daalein,\n" +
-        "     Production aur Preview dono ke liye.\n" +
-        "  3. Redeploy karein (env var add karne se purana build apne aap nahi banta).\n\n" +
-        "Baaki zaroori vars: AUTH_SECRET, VIDEO_TOKEN_SECRET, NEXT_PUBLIC_WHATSAPP_NUMBER.\n" +
-        "Poori list VERCEL.md mein hai.",
+        "  1. Vercel > Storage > Create Database > Neon (Postgres).\n" +
+        "  2. Project se connect karein — DATABASE_URL apne aap add ho jaata hai.\n" +
+        "  3. AUTH_SECRET, VIDEO_TOKEN_SECRET, NEXT_PUBLIC_WHATSAPP_NUMBER bhi daalein.\n" +
+        "  4. Redeploy karein (env var add karne se purana build apne aap nahi banta).",
     );
-  }
-
-  if (picked.clean !== picked.raw) {
-    console.log(
-      `\n[build] ${picked.name} ke aage/peeche quotes ya space the — saaf kar diya.`,
-    );
-  }
-
-  if (!/^postgres(ql)?:\/\//.test(picked.clean)) {
-    die(
-      `${YELLOW}${picked.name} postgres ka URL nahi lag raha.${RESET}\n\n` +
+  } else if (!/^postgres(ql)?:\/\//.test(picked.clean)) {
+    warnAndSkip(
+      `${YELLOW}${picked.name} postgres ka URL nahi lag raha — migrations skip.${RESET}\n\n` +
         `Abhi uski shuruaat hai: ${describe(picked.raw)}\n\n` +
         "Value postgresql:// se shuru honi chahiye.\n\n" +
         "Sabse aam galti — dashboard mein quotes ke saath paste karna:\n" +
@@ -113,15 +114,23 @@ function describe(raw) {
         '  galat: "postgresql://user:pass@host:5432/db?sslmode=require"\n\n' +
         "Doosri aam galti: file:./dev.db (SQLite) daal dena — woh Vercel par nahi chalta.",
     );
+  } else {
+    if (picked.clean !== picked.raw) {
+      console.log(
+        `\n[build] ${picked.name} ke aage/peeche quotes ya space the — saaf kar diya.`,
+      );
+    }
+    // Aage ke steps isi saaf value ko dekhein.
+    process.env.DATABASE_URL = picked.clean;
+    dbReady = true;
+    console.log(`[build] database: ${picked.name} se, ${describe(picked.clean)}`);
   }
-
-  // Aage ke steps isi saaf value ko dekhein.
-  process.env.DATABASE_URL = picked.clean;
-  console.log(`[build] database: ${picked.name} se, ${describe(picked.clean)}`);
 }
 
 // ---------------------------------------------------------------- 4. migrate
-{
+// DB jud gaya ho to migrations zaroori hain — yahan fail hona chahiye, warna
+// site bin-tables ke deploy ho jayegi aur har page 500 dega.
+if (dbReady) {
   const { code, out } = run("prisma migrate deploy", "npx", ["prisma", "migrate", "deploy"], {
     capture: true,
   });
