@@ -133,6 +133,12 @@ Razorpay dashboard mein set karein:
 | `npm run db:push` | Sirf schema push |
 | `npm run db:seed` | Sirf seed (pehle purana data saaf karta hai) |
 | `npm run db:studio` | Prisma Studio — DB browser |
+| `npm run db:use-postgres` / `db:use-sqlite` | Schema ka provider badalna |
+| `npm run docker:up` / `docker:down` / `docker:logs` | Docker compose |
+
+> Provider badalne ke baad `npx prisma generate` dobara chala lein — generated client
+> provider ke hisaab se banta hai, aur mismatch hone par
+> "URL must start with postgresql://" jaisa error aata hai.
 
 ---
 

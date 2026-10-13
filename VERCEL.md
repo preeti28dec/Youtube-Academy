@@ -32,11 +32,13 @@ Postgres (Storage tab → Create Database).
 Connection string copy karke agle step mein `DATABASE_URL` ki tarah daal dein. **Bas itna hi** —
 baaki repo mein pehle se taiyaar hai:
 
-- `vercel.json` ka build command khud provider ko `postgresql` kar deta hai aur
-  `prisma migrate deploy` chalata hai:
-  ```
-  node scripts/switch-db.mjs postgresql && prisma generate && prisma migrate deploy && next build
-  ```
+- `vercel.json` ka build command `node scripts/vercel-build.mjs` hai. Woh script
+  provider ko `postgresql` karti hai, client generate karti hai, migrations lagati hai,
+  phir `next build` chalati hai — **har step ka naam log mein aata hai**, isliye kuch
+  toote to pata chal jaata hai ki kahan.
+- Woh do aam dikkatein khud sambhaalti hai: `DATABASE_URL` na hone par saaf message
+  (kya karna hai uske saath), aur `P3005` (DB mein tables pehle se hain) par
+  `0_init` ko baseline maan kar aage badh jaati hai.
 - `prisma/migrations/0_init/` mein Postgres ka initial migration commit hai.
 - Repo ka `schema.prisma` `sqlite` par hi rehta hai, taaki `npm run dev` local par
   bina kisi DB server ke chalta rahe.
@@ -49,7 +51,7 @@ Production, Preview — dono par:
 
 | Name | Value |
 | --- | --- |
-| `DATABASE_URL` | Postgres connection string (`?sslmode=require` ke saath) |
+| `DATABASE_URL` | Postgres connection string (`?sslmode=require` ke saath). **Quotes mat lagayein** — dashboard poori string literal maanta hai. |
 | `AUTH_SECRET` | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
 | `VIDEO_TOKEN_SECRET` | wahi command, **alag** value |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | `91XXXXXXXXXX` |
@@ -83,6 +85,27 @@ Server us URL ko proxy karta hai, isliye:
 - [ ] Env vars set karne ke **baad** redeploy kiya
 - [ ] Razorpay webhook URL `https://<domain>/api/payment/webhook` par point karta hai
 - [ ] Har lesson ke video field mein external URL hai (Vercel par local file nahi chalti)
+
+---
+
+## Build fail ho to
+
+Log mein `[build] <step ka naam>` dhoondhein — jis step ke baad `[build] ruk gaya`
+aaya, wahi toota hai.
+
+| Log mein | Matlab | Fix |
+| --- | --- | --- |
+| `DATABASE_URL set nahi hai` | Postgres abhi laga hi nahi | Step 1 aur 2 karein, phir redeploy |
+| `postgres ka URL nahi lag raha` | value quotes ke saath hai, ya SQLite ka `file:...` hai | quotes hata dein; postgres string daalein |
+| `Database tak pahunch nahi paaye` (P1001) | URL hai, connection nahi bana | password/host check karein; `?sslmode=require` lagayein |
+| `P3005` | DB mein tables pehle se hain | script khud baseline kar leti hai; na ho to niche dekhein |
+| `next build fail hua` | code ya type error | upar ka asli error padhein |
+
+`P3005` khud na sulajhe (jaise DB mein adhoora schema pada ho) to seedha sabse aasaan
+raasta: us database ko khaali kar dein (Neon/Supabase par naya database bana lein) aur
+redeploy karein — initial migration poora schema khud bana degi.
+
+Env var add/badalne ke **baad redeploy zaroori hai**. Purana build naye vars nahi uthata.
 
 ---
 
