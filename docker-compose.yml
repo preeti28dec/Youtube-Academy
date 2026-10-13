@@ -1,0 +1,76 @@
+# Sohail YouTube Academy — app + PostgreSQL, ek command mein.
+#
+#   docker compose up --build          # pehli baar
+#   docker compose up -d               # baad mein
+#   docker compose logs -f app
+#   docker compose down                # rokna (data bacha rehta hai)
+#   docker compose down -v             # data bhi hatana
+#
+# Pehli baar demo data chahiye to:  SEED_ON_START=true docker compose up --build
+#
+# Secrets: project root mein `.env.docker` banayein (`.env.docker.example` dekhein).
+# Compose usko padhta hai; `.env` (local sqlite wala) ko haath nahi lagata.
+
+name: sohail-youtube-academy
+
+x-db-url: &db-url
+  DATABASE_URL: postgresql://sya:${POSTGRES_PASSWORD:-sya_dev_password}@db:5432/sya?schema=public
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sya
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sya_dev_password}
+      POSTGRES_DB: sya
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Sirf local debugging ke liye (Prisma Studio, psql). Production mein
+    # yeh lines hata dein — DB ko internet par expose karne ki zaroorat nahi.
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sya -d sya"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  # Ek baar chalta hai, schema lagata hai, phir exit. App iske baad start hota hai.
+  migrate:
+    build:
+      context: .
+      target: migrator
+    environment:
+      <<: *db-url
+      SEED_ON_START: ${SEED_ON_START:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    build:
+      context: .
+      target: runner
+    restart: unless-stopped
+    environment:
+      <<: *db-url
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET set karein (.env.docker mein)}
+      VIDEO_TOKEN_SECRET: ${VIDEO_TOKEN_SECRET:?VIDEO_TOKEN_SECRET set karein (.env.docker mein)}
+      NEXT_PUBLIC_WHATSAPP_NUMBER: ${NEXT_PUBLIC_WHATSAPP_NUMBER:-919999999999}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:-}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "3000:3000"
+    volumes:
+      # Uploaded videos container ke bahar rehti hain — restart/rebuild par bachi rahengi.
+      - media:/app/media
+
+volumes:
+  pgdata:
+  media:

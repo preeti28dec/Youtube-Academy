@@ -1,0 +1,13 @@
+# Windows par develop hota hai, Linux container mein chalta hai.
+# CRLF ke saath commit hua shell script container mein
+# "/bin/sh^M: bad interpreter" deta hai — isliye sab kuch LF.
+* text=auto eol=lf
+
+*.sh      text eol=lf
+Dockerfile text eol=lf
+*.mjs     text eol=lf
+
+*.png binary
+*.jpg binary
+*.woff2 binary
+*.mp4 binary

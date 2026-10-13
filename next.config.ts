@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Sirf Docker build ke liye — .next/standalone mein apna chhota server aur
+  // sirf zaroori node_modules aate hain. Vercel ka apna bundler hai aur wahan
+  // standalone output se dikkat hoti hai, isliye flag ke peeche rakha hai.
+  ...(process.env.DOCKER_BUILD === "1" ? { output: "standalone" as const } : {}),
+
   // Course videos ko hotlink / iframe embed hone se rokne ke liye.
   async headers() {
     return [
