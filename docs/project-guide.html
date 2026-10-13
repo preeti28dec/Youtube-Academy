@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<title>Sohail YouTube Academy — Project Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171c; --body:#3b414b; --muted:#8a909b; --faint:#969ca7;
+    --line:#e9eaee; --line2:#dde0e5; --soft:#f2f3f5; --fill:#eef0f3;
+    --brand:#4f56e3; --brand-dark:#3b41c4; --brand-soft:#ebecfb;
+    --ok:#1f9d57; --ok-soft:#e4f4ea; --warn:#d3a23e; --warn-soft:#fdf5e4;
+    --danger:#d24b41; --danger-soft:#fbe4e1;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Inter,sans-serif;color:var(--ink);font-size:10.5pt;line-height:1.6}
+  code,.mono{font-family:'JetBrains Mono',monospace;font-size:9pt}
+
+  @page{size:A4;margin:16mm 14mm}
+  .page{page-break-after:always}
+  .page:last-child{page-break-after:auto}
+  h2,h3{break-after:avoid}
+  table,.card,.step,.kv{break-inside:avoid}
+
+  /* ---------- cover ---------- */
+  .cover{display:flex;flex-direction:column;justify-content:center;min-height:245mm}
+  .logo{display:flex;align-items:center;gap:10px;margin-bottom:38px}
+  .logo .mark{width:40px;height:40px;border-radius:10px;background:var(--brand);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px}
+  .logo .name{font-weight:800;font-size:15pt;letter-spacing:-.01em}
+  .logo .tag{font-size:8.5pt;color:var(--muted);font-weight:500}
+  .cover h1{font-size:30pt;font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:14px}
+  .cover .sub{font-size:12pt;color:var(--body);max-width:135mm;line-height:1.55}
+  .cover .meta{margin-top:40px;border-top:1px solid var(--line);padding-top:18px;
+    display:grid;grid-template-columns:repeat(2,1fr);gap:14px 26px;max-width:135mm}
+  .cover .meta div span{display:block}
+  .cover .meta .k{font-size:8pt;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:600;margin-bottom:3px}
+  .cover .meta .v{font-size:10pt;font-weight:600}
+
+  /* ---------- structure ---------- */
+  .sec{margin-bottom:22px}
+  .eyebrow{font-size:8pt;text-transform:uppercase;letter-spacing:.09em;color:var(--faint);font-weight:600;margin-bottom:5px}
+  h2{font-size:17pt;font-weight:800;letter-spacing:-.02em;margin-bottom:10px;padding-bottom:7px;border-bottom:2px solid var(--ink)}
+  h3{font-size:11.5pt;font-weight:700;margin:16px 0 7px}
+  h4{font-size:10pt;font-weight:700;margin:12px 0 5px}
+  p{margin-bottom:8px;color:var(--body)}
+  p strong,li strong{color:var(--ink)}
+  ul,ol{margin:0 0 9px 17px;color:var(--body)}
+  li{margin-bottom:4px}
+
+  table{width:100%;border-collapse:collapse;margin:9px 0 13px;font-size:9.5pt}
+  th{background:var(--fill);text-align:left;padding:7px 9px;font-weight:700;font-size:8.5pt;
+    text-transform:uppercase;letter-spacing:.05em;color:var(--body);border-bottom:1px solid var(--line2)}
+  td{padding:7px 9px;border-bottom:1px solid var(--soft);vertical-align:top;color:var(--body)}
+  td:first-child{font-weight:600;color:var(--ink)}
+  td code{background:var(--fill);padding:1px 4px;border-radius:3px}
+
+  .card{border:1px solid var(--line);border-radius:9px;padding:13px 15px;margin:10px 0;background:#fff}
+  .card.brand{border-color:var(--brand);background:var(--brand-soft)}
+  .card.ok{border-color:var(--ok);background:var(--ok-soft)}
+  .card.warn{border-color:var(--warn);background:var(--warn-soft)}
+  .card.dark{background:var(--ink);border-color:var(--ink);color:#fff}
+  .card.dark p,.card.dark li{color:#c3c8d0}
+  .card.dark strong{color:#fff}
+  .card .ct{font-weight:700;font-size:10pt;margin-bottom:5px;display:block}
+
+  .step{display:flex;gap:11px;margin-bottom:11px;align-items:flex-start}
+  .step .n{flex:0 0 22px;height:22px;border-radius:6px;background:var(--brand);color:#fff;
+    font-size:9pt;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .step .b{flex:1}
+  .step .t{font-weight:700;font-size:10.5pt;margin-bottom:2px}
+
+  pre{background:var(--ink);color:#e6e8ec;padding:10px 12px;border-radius:7px;
+    font-family:'JetBrains Mono',monospace;font-size:8.5pt;line-height:1.5;
+    overflow-wrap:break-word;white-space:pre-wrap;margin:8px 0 11px}
+  pre .c{color:#8a909b}
+
+  .flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:9px 0 12px}
+  .flow span{background:var(--brand-soft);color:var(--brand-dark);padding:6px 10px;
+    border-radius:7px;font-size:9pt;font-weight:600}
+  .flow i{color:var(--muted);font-style:normal;font-weight:700}
+
+  .kv{display:grid;grid-template-columns:42mm 1fr;gap:5px 12px;margin:9px 0 12px;font-size:9.5pt}
+  .kv .k{font-weight:600;color:var(--muted)}
+  .kv .v{color:var(--ink)}
+
+  .pill{display:inline-block;background:var(--fill);border-radius:999px;padding:2px 9px;
+    font-size:8.5pt;font-weight:600;color:var(--body)}
+  .pill.ok{background:var(--ok-soft);color:var(--ok)}
+  .pill.warn{background:var(--warn-soft);color:#9a7420}
+  .foot{margin-top:26px;padding-top:10px;border-top:1px solid var(--line);
+    font-size:8.5pt;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- ============================ COVER ============================ -->
+<section class="page cover">
+  <div class="logo">
+    <span class="mark">▶</span>
+    <span>
+      <span class="name">Sohail YouTube Academy</span><br>
+      <span class="tag">Learn. Create. Grow.</span>
+    </span>
+  </div>
+
+  <h1>Project Guide</h1>
+  <p class="sub">
+    Course bechne wali website — kya banaya gaya hai, kaise kaam karta hai,
+    kaun si technology lagi hai, aur step-by-step kaise setup hua.
+    Yeh document developer aur non-technical dono ke liye likha gaya hai.
+  </p>
+
+  <div class="meta">
+    <div><span class="k">Project</span><span class="v">Sohail YouTube Academy</span></div>
+    <div><span class="k">Type</span><span class="v">Course-selling website (single course)</span></div>
+    <div><span class="k">Stack</span><span class="v">Next.js 15 · Node.js · PostgreSQL</span></div>
+    <div><span class="k">Hosting</span><span class="v">Vercel + Neon Postgres</span></div>
+    <div><span class="k">Repository</span><span class="v mono">github.com/preeti28dec/Youtube-Academy</span></div>
+    <div><span class="k">Document date</span><span class="v">13 October 2026</span></div>
+  </div>
+</section>
+
+<!-- ============================ 1. OVERVIEW ============================ -->
+<section class="page">
+  <div class="sec">
+    <div class="eyebrow">Section 1</div>
+    <h2>Project kya hai</h2>
+    <p>
+      Yeh ek <strong>course bechne wali website</strong> hai. Sohail apna YouTube course
+      online bechte hain — student website par aata hai, payment karta hai, aur turant
+      course dekhna shuru kar deta hai. Beech mein kisi ko kuch manually karne ki
+      zaroorat nahi padti.
+    </p>
+
+    <h3>Poora flow — ek line mein</h3>
+    <div class="flow">
+      <span>Student site par aata hai</span><i>›</i>
+      <span>Payment karta hai</span><i>›</i>
+      <span>Account apne aap banta hai</span><i>›</i>
+      <span>Course unlock</span><i>›</i>
+      <span>Videos dekhta hai</span><i>›</i>
+      <span>Progress save hoti hai</span>
+    </div>
+
+    <h3>Sabse khaas baat</h3>
+    <div class="card brand">
+      <span class="ct">Videos secure hain</span>
+      <p style="margin-bottom:0">
+        Jisne paise nahi diye, woh video nahi dekh sakta — chahe usko link hi kyun na
+        mil jaaye. Yeh is project ki sabse zaroori requirement thi, aur poora system
+        isi ke aas-paas bana hai. Detail Section 6 mein hai.
+      </p>
+    </div>
+
+    <h3>Design kahan se aaya</h3>
+    <p>
+      Design ek prototype se liya gaya hai — wahi colors, wahi spacing, wahi text.
+      Rang indigo (<code>#4f56e3</code>), font Inter, look saaf aur bharosemand —
+      taaki site tez chale aur maintenance sasta rahe.
+    </p>
+  </div>
+
+  <div class="sec">
+    <div class="eyebrow">Section 2</div>
+    <h2>Kya-kya bana hai</h2>
+    <p>Client ne 12 features maange the. Saare bane hue hain:</p>
+
+    <table>
+      <tr><th style="width:9mm">#</th><th style="width:38mm">Feature</th><th>Kaise kaam karta hai</th></tr>
+      <tr><td>01</td><td>Home page</td><td>Course ka parichay, benefits, price, Enroll Now button, curriculum, mentor, FAQ</td></tr>
+      <tr><td>02</td><td>Course details</td><td>Poora description, "aap kya seekhenge", aur saare modules/lessons duration ke saath</td></tr>
+      <tr><td>03</td><td>Payment page</td><td>Naam, mobile, email + UPI / Card / Net Banking</td></tr>
+      <tr><td>04</td><td>Auto account</td><td>Payment confirm hote hi account banta hai, course khulta hai, password email par</td></tr>
+      <tr><td>05</td><td>Student login</td><td>Email <em>ya</em> mobile + password</td></tr>
+      <tr><td>06</td><td>Dashboard</td><td>Kharida hua course, saare modules, aur "Continue learning"</td></tr>
+      <tr><td>07</td><td>Video course</td><td>Videos website ke andar hi, secure player mein</td></tr>
+      <tr><td>08</td><td>Progress tracking</td><td>Har lesson par "Mark as complete", dashboard par percentage</td></tr>
+      <tr><td>09</td><td>WhatsApp support</td><td>Har page par floating button, pehle se likhe message ke saath</td></tr>
+      <tr><td>10</td><td>Admin panel</td><td>Module/lesson add-edit-delete, video jodna, students ki list</td></tr>
+      <tr><td>11</td><td>Mobile friendly</td><td>Saare pages mobile ke liye pehle design kiye gaye</td></tr>
+      <tr><td>12</td><td>Simple design</td><td>Koi bhaari animation nahi — site tez, maintenance sasta</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============================ 3. STACK ============================ -->
+<section class="page">
+  <div class="sec">
+    <div class="eyebrow">Section 3</div>
+    <h2>Technology — kya use hua aur kyun</h2>
+
+    <table>
+      <tr><th style="width:36mm">Cheez</th><th style="width:34mm">Kya chuna</th><th>Kyun</th></tr>
+      <tr><td>Frontend</td><td>Next.js 15 + React 19</td><td>Tez, SEO-friendly, aur Google par achhe se dikhta hai</td></tr>
+      <tr><td>Backend</td><td>Node.js (Next.js ke andar hi)</td><td>Frontend aur backend ek hi app mein — ek deploy, ek server, ek bill</td></tr>
+      <tr><td>Database</td><td>PostgreSQL (Prisma ORM)</td><td>Paisa involved hai, isliye transactions aur constraints zaroori</td></tr>
+      <tr><td>Styling</td><td>Tailwind CSS v4</td><td>Design tokens ek jagah, CSS file chhoti rehti hai</td></tr>
+      <tr><td>Login</td><td>JWT + httpOnly cookie</td><td>Token JavaScript se padha nahi ja sakta — XSS se surakshit</td></tr>
+      <tr><td>Password</td><td>bcrypt</td><td>Password kabhi seedha save nahi hota</td></tr>
+      <tr><td>Payment</td><td>Razorpay (Cashfree bhi chalega)</td><td>UPI, Card, Net Banking — sab ek jagah</td></tr>
+      <tr><td>Hosting</td><td>Vercel</td><td>Git push karte hi deploy, free SSL, auto scaling</td></tr>
+      <tr><td>Database hosting</td><td>Neon (Vercel ke andar se)</td><td>Free tier, Singapore region — India ke paas</td></tr>
+    </table>
+
+    <h3>Database kyun PostgreSQL</h3>
+    <p>Is site ka saara data aapas mein juda hua hai:</p>
+    <pre>User ──&lt; Order &gt;── Course ──&lt; Module ──&lt; Lesson
+  │                  │                      │
+  └──&lt; Enrollment ───┘                      │
+  └──&lt; Progress ──────────────────────────────┘</pre>
+
+    <ol>
+      <li><strong>Paisa involved hai.</strong> "Payment hua → account bana → access mila" — teeno
+        ek saath hone chahiye, ya ek bhi nahi. Postgres transactions yeh guarantee dete hain.</li>
+      <li><strong>Duplicate rokna zaroori hai.</strong> Database khud double enrollment reject
+        karta hai, chahe payment ka confirmation do baar aa jaaye.</li>
+      <li><strong>Reporting aasaan.</strong> "Is mahine kitne students" — ek query. Admin panel
+        ke stats isi par chalte hain.</li>
+      <li><strong>Sasta aur aam.</strong> Har hosting provider deta hai, free tier mil jaata hai.</li>
+    </ol>
+    <p>
+      MySQL bhi chal jaata. <strong>MongoDB is project ke liye theek nahi</strong> — data relational
+      hai, aur payments mein constraints ka database-level par hona zyada safe hai.
+    </p>
+  </div>
+</section>
+
+<!-- ============================ 4. DB DESIGN ============================ -->
+<section class="page">
+  <div class="sec">
+    <div class="eyebrow">Section 4</div>
+    <h2>Database mein kya-kya rakha hai</h2>
+
+    <table>
+      <tr><th style="width:30mm">Table</th><th>Kya rakhta hai</th></tr>
+      <tr><td>User</td><td>Student aur admin dono. Naam, email, mobile, password (hashed), role</td></tr>
+      <tr><td>Course</td><td>Course ka naam, description, price (paise mein — decimal ki galti se bachne ke liye)</td></tr>
+      <tr><td>Module</td><td>Course ke chapter, sahi order mein</td></tr>
+      <tr><td>Lesson</td><td>Har video — title, duration, free preview hai ya nahi, video ka reference</td></tr>
+      <tr><td>Order</td><td>Payment ka record — kitna, kis method se, gateway ki id, status</td></tr>
+      <tr><td>Enrollment</td><td><strong>Access ka single source of truth.</strong> Yeh row hai to course khulta hai, warna nahi</td></tr>
+      <tr><td>Progress</td><td>Kis student ne kaun sa lesson complete kiya</td></tr>
+    </table>
+
+    <div class="card">
+      <span class="ct">Do zaroori rules database mein hi likhe hain</span>
+      <ul style="margin-bottom:0">
+        <li>Ek student ek course mein <strong>sirf ek baar</strong> enroll ho sakta hai</li>
+        <li>Ek lesson ka progress <strong>sirf ek baar</strong> save hota hai</li>
+      </ul>
+    </div>
+    <p>
+      Yeh rules application code mein nahi, <strong>database mein</strong> hain. Iska matlab:
+      code mein koi bug bhi aa jaaye, to bhi duplicate data nahi ban sakta.
+    </p>
+  </div>
+
+  <div class="sec">
+    <div class="eyebrow">Section 5</div>
+    <h2>Payment kaise kaam karta hai</h2>
+
+    <div class="flow">
+      <span>Student details bharta hai</span><i>›</i>
+      <span>Gateway par payment</span><i>›</i>
+      <span>Gateway ka webhook</span><i>›</i>
+      <span>Account + access</span><i>›</i>
+      <span>Login details email par</span>
+    </div>
+
+    <div class="card warn">
+      <span class="ct">Sabse zaroori baat</span>
+      <p style="margin-bottom:0">
+        Course ka access <strong>browser ke "payment successful" message par nahi</strong>
+        diya jaata. Woh message koi bhi nakli bana sakta hai. Access tab milta hai jab
+        <strong>payment gateway ka server khud</strong> hamare server ko confirm karta hai
+        (webhook), aur uska digital signature verify ho jaata hai.
+      </p>
+    </div>
+
+    <h3>Demo mode</h3>
+    <p>
+      Razorpay ki keys na hon to app "demo mode" mein chalta hai — poora flow waisa hi
+      chalta hai (form, order, account banna, course khulna), bas asli paisa nahi katta.
+      Keys daalte hi real ho jaata hai; code badalne ki zaroorat nahi.
+    </p>
+  </div>
+</section>
+
+<!-- ============================ 6. VIDEO SECURITY ============================ -->
+<section class="page">
+  <div class="sec">
+    <div class="eyebrow">Section 6</div>
+    <h2>Videos kaise secure hain</h2>
+    <p>
+      Client ka sabse bada sawaal yahi tha: <em>"kya koi doosra vyakti direct link se
+      course videos dekh sakta hai?"</em> Jawab: <strong>nahi</strong>. Teen layer lagi hui hain.
+    </p>
+
+    <div class="step">
+      <span class="n">1</span>
+      <div class="b">
+        <div class="t">Video ka link page mein hota hi nahi</div>
+        <p style="margin-bottom:0">Page ka source code dekhne par video ki file ka pata
+          nahi milta. Player har baar server se naya link maangta hai.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="n">2</span>
+      <div class="b">
+        <div class="t">Server pehle check karta hai ki payment hua hai</div>
+        <p style="margin-bottom:0">Enrollment record hi access ka proof hai. Free preview
+          lessons sabko milte hain, baaki sirf enrolled student ko.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="n">3</span>
+      <div class="b">
+        <div class="t">Link sirf 2 minute chalta hai, aur sirf usi student ke liye</div>
+        <p style="margin-bottom:0">Link ke andar lesson, student aur expiry — teeno
+          cryptographically signed hote hain. Link copy karke kisi aur ko bhejne par
+          server saaf mana kar deta hai.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="n">4</span>
+      <div class="b">
+        <div class="t">Har student ka watermark</div>
+        <p style="margin-bottom:0">Video ke upar student ka email halka sa dikhta rehta
+          hai. Koi recording leak kare to pata chal jaata hai kisne ki.</p>
+      </div>
+    </div>
+
+    <h3>Yeh test kiya gaya hai</h3>
+    <table>
+      <tr><th>Test</th><th style="width:34mm">Result</th></tr>
+      <tr><td>Apne account se video chalana</td><td><span class="pill ok">Chalti hai</span></td></tr>
+      <tr><td>Wahi link kisi aur ko bhejna</td><td><span class="pill ok">403 — nahi chalti</span></td></tr>
+      <tr><td>Wahi link dusre logged-in user se</td><td><span class="pill ok">403 — nahi chalti</span></td></tr>
+      <tr><td>Purana (expire) link</td><td><span class="pill ok">403 — nahi chalti</span></td></tr>
+      <tr><td>Link ko thoda badal kar try karna</td><td><span class="pill ok">403 — nahi chalti</span></td></tr>
+      <tr><td>Video file ka URL seedha kholna</td><td><span class="pill ok">404 — milti hi nahi</span></td></tr>
+      <tr><td>Video beech se aage khinchna (seek)</td><td><span class="pill ok">Theek chalta hai</span></td></tr>
+    </table>
+
+    <div class="card dark">
+      <span class="ct">Imaandari se ek baat</span>
+      <p style="margin-bottom:0">
+        Duniya ka <strong>koi bhi</strong> system mobile se screen recording ko 100% nahi rok
+        sakta — Netflix aur Udemy bhi nahi. Lekin DRM kai devices par recording ko black
+        screen kar deta hai, aur watermark se leak karne wala pehchana ja sakta hai.
+        Isliye leak ka risk practically bahut kam ho jaata hai. Jo bhi "100% impossible"
+        ka vaada kare, woh sach nahi bol raha.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 7. SETUP STEPS ============================ -->
+<section class="page">
+  <div class="sec">
+    <div class="eyebrow">Section 7</div>
+    <h2>Setup kaise hua — step by step</h2>
+    <p>Project zero se yahan tak kin kadmon se pahuncha:</p>
+
+    <h3>Part A — Code</h3>
+    <div class="step"><span class="n">1</span><div class="b">
+      <div class="t">Design se code</div>
+      <p style="margin-bottom:0">Prototype se saare colors, spacing aur text nikaal kar
+        Tailwind design tokens banaye, taaki poori site ek jaisi dikhe.</p></div></div>
+    <div class="step"><span class="n">2</span><div class="b">
+      <div class="t">Next.js project</div>
+      <p style="margin-bottom:0">TypeScript, Tailwind v4, aur Prisma ke saath. Frontend
+        aur backend dono ek hi app mein.</p></div></div>
+    <div class="step"><span class="n">3</span><div class="b">
+      <div class="t">Database design</div>
+      <p style="margin-bottom:0">7 tables, aur access ke rules database level par.</p></div></div>
+    <div class="step"><span class="n">4</span><div class="b">
+      <div class="t">Pages aur APIs</div>
+      <p style="margin-bottom:0">9 pages aur 13 API routes — login, payment, progress,
+        video token, admin CRUD.</p></div></div>
+    <div class="step"><span class="n">5</span><div class="b">
+      <div class="t">Video security layer</div>
+      <p style="margin-bottom:0">Signed token + stream route + watermark. Har layer alag
+        se test ki gayi.</p></div></div>
+    <div class="step"><span class="n">6</span><div class="b">
+      <div class="t">GitHub par push</div>
+      <p style="margin-bottom:0"><code>github.com/preeti28dec/Youtube-Academy</code></p></div></div>
+
+    <h3>Part B — Live karna (Vercel)</h3>
+    <div class="step"><span class="n">7</span><div class="b">
+      <div class="t">Vercel se GitHub repo jodna</div>
+      <p style="margin-bottom:0">Ab har <code>git push</code> par site apne aap deploy hoti hai.</p></div></div>
+    <div class="step"><span class="n">8</span><div class="b">
+      <div class="t">Database banana — Neon Postgres</div>
+      <p style="margin-bottom:0">Vercel → Storage → Create Database → Neon. Free plan,
+        Singapore region (India ke paas), no credit card. Project se connect karte hi
+        <code>DATABASE_URL</code> apne aap set ho jaata hai.</p></div></div>
+    <div class="step"><span class="n">9</span><div class="b">
+      <div class="t">Secrets daalna</div>
+      <p style="margin-bottom:0"><code>AUTH_SECRET</code> aur <code>VIDEO_TOKEN_SECRET</code> —
+        Production aur Preview dono par. Inke bina app jaan-boojh kar chalta hi nahi.</p></div></div>
+    <div class="step"><span class="n">10</span><div class="b">
+      <div class="t">Database ka schema</div>
+      <p style="margin-bottom:0">Har deploy par migrations apne aap chalti hain — tables
+        bann jaate hain.</p></div></div>
+    <div class="step"><span class="n">11</span><div class="b">
+      <div class="t">Course ka content</div>
+      <p style="margin-bottom:0">Pehli baar <code>/setup</code> page par form bhar kar
+        syllabus aur admin account banaya. Yeh form sirf tab tak chalta hai jab tak
+        database bilkul khaali hai.</p></div></div>
+  </div>
+</section>
+
+<!-- ============================ 8. SAFETY NET ============================ -->
+<section class="page">
+  <div class="sec">
+    <div class="eyebrow">Section 8</div>
+    <h2>Setup ke liye jo safety net banaya gaya</h2>
+    <p>
+      Deploy karte waqt sabse aam dikkat yeh hoti hai ki configuration adhoori reh jaati
+      hai aur site bina kuch bataye crash kar jaati hai. Isse bachne ke liye:
+    </p>
+
+    <table>
+      <tr><th style="width:52mm">Situation</th><th>App kya karta hai</th></tr>
+      <tr><td>Database ka address nahi hai</td><td>Build fail nahi hoti. Site deploy ho jaati hai aur har page par <strong>setup screen</strong> dikhti hai jisme likha hota hai ki kya daalna hai</td></tr>
+      <tr><td>Address galat hai</td><td>Setup screen uski shuruaat dikhata hai (password nahi), taaki galti turant samajh aaye</td></tr>
+      <tr><td>Value quotes ke saath paste ho gayi</td><td>App khud quotes hata deta hai — yeh sabse aam galti hai</td></tr>
+      <tr><td>Secrets nahi hain</td><td>App chalne se mana kar deta hai. Aadhe-adhoore secrets ke saath chalna asurakshit hai</td></tr>
+      <tr><td>Database khaali hai</td><td>Setup page par form aata hai jo shuruaati content bana deta hai</td></tr>
+    </table>
+
+    <div class="card ok">
+      <span class="ct">Faayda</span>
+      <p style="margin-bottom:0">
+        Site kabhi bina wajah bataye band nahi hoti. Jo bhi kami hoti hai, woh screen par
+        saaf likhi hoti hai — technical log padhne ki zaroorat nahi.
+      </p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="eyebrow">Section 9</div>
+    <h2>Website ke pages</h2>
+    <table>
+      <tr><th style="width:38mm">Page</th><th style="width:48mm">Kya dikhta hai</th><th>Kaun dekh sakta hai</th></tr>
+      <tr><td>/</td><td>Landing — benefits, curriculum, mentor, FAQ, price</td><td>Sab</td></tr>
+      <tr><td>/course</td><td>Poora description + syllabus</td><td>Sab</td></tr>
+      <tr><td>/checkout</td><td>Payment form</td><td>Sab</td></tr>
+      <tr><td>/login</td><td>Student login</td><td>Sab</td></tr>
+      <tr><td>/dashboard</td><td>Kharida hua course + progress</td><td>Enrolled student</td></tr>
+      <tr><td>/learn/...</td><td>Video player</td><td>Enrolled (free preview sabko)</td></tr>
+      <tr><td>/admin</td><td>Course aur students manage karna</td><td>Sirf admin</td></tr>
+      <tr><td>/guide</td><td>Client ke liye poori jaankari</td><td>Sab</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============================ 10. ADMIN + LOCAL ============================ -->
+<section class="page">
+  <div class="sec">
+    <div class="eyebrow">Section 10</div>
+    <h2>Admin panel — rozmarra ka kaam</h2>
+    <p>Sohail ko developer ki zaroorat nahi padegi. <code>/admin</code> par login karke:</p>
+    <ul>
+      <li>Naya <strong>module</strong> (chapter) add karna</li>
+      <li>Naya <strong>lesson</strong> add karna — title, duration, video</li>
+      <li>Lesson ka naam ya duration <strong>edit</strong> karna</li>
+      <li>Kisi lesson ko <strong>free preview</strong> banana (bina payment ke dikhega)</li>
+      <li>Module ya lesson <strong>delete</strong> karna</li>
+      <li><strong>Students ki list</strong> dekhna — naam, mobile, email, kab join kiya, kitna progress</li>
+      <li>Naam/email/mobile se student <strong>search</strong> karna</li>
+    </ul>
+
+    <h3>Video kaise jodein</h3>
+    <p>
+      Video kisi secure video host (Bunny Stream, VdoCipher, ya S3) par upload karein aur
+      uska link admin panel mein lesson ke video field mein paste kar dein. Bas itna hi —
+      baaki security apne aap lag jaati hai.
+    </p>
+
+    <div class="card">
+      <span class="ct">Video host kyun zaroori hai</span>
+      <p style="margin-bottom:0">
+        Website ka server badi video files rakhne ke liye nahi bana. Video host se video
+        tez chalti hai, kam kharcha hota hai, aur DRM jaisi suraksha bhi milti hai.
+      </p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="eyebrow">Section 11</div>
+    <h2>Apne computer par kaise chalayein</h2>
+    <p>Developer ke liye. Ek baar setup, phir ek command:</p>
+    <pre><span class="c"># 1. code lein</span>
+git clone https://github.com/preeti28dec/Youtube-Academy.git
+cd Youtube-Academy
+
+<span class="c"># 2. packages install karein</span>
+npm install
+
+<span class="c"># 3. settings file banayein</span>
+cp .env.example .env
+
+<span class="c"># 4. database banayein + demo data daalein</span>
+npm run setup
+
+<span class="c"># 5. chalayein -&gt; http://localhost:3000</span>
+npm run dev</pre>
+
+    <p>
+      Local par database <strong>SQLite</strong> hai — ek file, koi server install nahi karna
+      padta. Production par wahi code PostgreSQL par chalta hai; sirf ek line badalti hai.
+    </p>
+
+    <h3>Docker se bhi chal sakta hai</h3>
+    <pre>cp .env.docker.example .env.docker
+npm run docker:up     <span class="c"># app + PostgreSQL, dono ek saath</span></pre>
+  </div>
+</section>
+
+<!-- ============================ 12. STATUS + COST ============================ -->
+<section class="page">
+  <div class="sec">
+    <div class="eyebrow">Section 12</div>
+    <h2>Abhi kya taiyaar hai, kya baaki</h2>
+
+    <h3>Taiyaar</h3>
+    <table>
+      <tr><td style="width:52mm">Website live hai</td><td><span class="pill ok">Ho gaya</span> Vercel par</td></tr>
+      <tr><td>Database jud gaya</td><td><span class="pill ok">Ho gaya</span> Neon Postgres, Singapore</td></tr>
+      <tr><td>Course ka syllabus</td><td><span class="pill ok">Ho gaya</span> 6 modules, 20 lessons</td></tr>
+      <tr><td>Admin account</td><td><span class="pill ok">Ho gaya</span></td></tr>
+      <tr><td>Saare 12 features</td><td><span class="pill ok">Ho gaya</span></td></tr>
+      <tr><td>Video security</td><td><span class="pill ok">Ho gaya</span> test kiya hua</td></tr>
+    </table>
+
+    <h3>Baaki</h3>
+    <table>
+      <tr><td style="width:52mm">Asli videos</td><td><span class="pill warn">Baaki</span> Video host par upload karke admin se jodni hain</td></tr>
+      <tr><td>WhatsApp number</td><td><span class="pill warn">Baaki</span> Abhi placeholder hai</td></tr>
+      <tr><td>Razorpay live keys</td><td><span class="pill warn">Baaki</span> Abhi demo mode — asli paisa nahi katta</td></tr>
+      <tr><td>Sohail ki photo</td><td><span class="pill warn">Baaki</span> Mentor section mein placeholder</td></tr>
+      <tr><td>Privacy / Terms / Refund</td><td><span class="pill warn">Baaki</span> Payment gateway ko chahiye hote hain</td></tr>
+      <tr><td>Password reset flow</td><td><span class="pill warn">Baaki</span> Scope mein nahi tha</td></tr>
+    </table>
+  </div>
+
+  <div class="sec">
+    <div class="eyebrow">Section 13</div>
+    <h2>Kharcha</h2>
+    <p style="font-size:9.5pt;color:var(--muted)">
+      Third-party prices October 2026 ke public plans par aadharit <strong>anumaan</strong> hain
+      aur badalte rehte hain — quote dene se pehle aaj ke rates confirm kar lein.
+    </p>
+
+    <table>
+      <tr><th style="width:42mm">Mad</th><th style="width:36mm">Anumaanit</th><th>Note</th></tr>
+      <tr><td>Domain</td><td>₹800–1,500 / saal</td><td>Sirf yahi shuruaat mein zaroori hai</td></tr>
+      <tr><td>Website hosting</td><td>₹0 shuruaat mein</td><td>Vercel free tier</td></tr>
+      <tr><td>Database</td><td>₹0 shuruaat mein</td><td>Neon free tier — 1 GB</td></tr>
+      <tr><td>SSL (https)</td><td>₹0</td><td>Apne aap renew hota hai</td></tr>
+      <tr><td>Video hosting</td><td>~₹300–800 / mahina</td><td>100 students par (Bunny Stream)</td></tr>
+      <tr><td>Payment — UPI</td><td>Aam taur par 0%</td><td>RBI ka zero-MDR rule</td></tr>
+      <tr><td>Payment — Card / Net Banking</td><td>~2% + GST</td><td>₹1,499 par lagbhag ₹35</td></tr>
+      <tr><td>Maintenance</td><td><strong>Koi compulsory nahi</strong></td><td>Content Sohail khud admin se badal sakte hain</td></tr>
+    </table>
+
+    <div class="card brand">
+      <span class="ct">Shuruaat mein kul kharcha</span>
+      <p style="margin-bottom:0">
+        <strong>Lagbhag ₹1,500 / saal</strong> — sirf domain. Baaki sab free tier par chal
+        jaata hai. Students badhne par video hosting aur database paid tier par jaate hain.
+      </p>
+    </div>
+
+    <div class="foot">
+      Sohail YouTube Academy — Project Guide · 13 October 2026<br>
+      Repository: github.com/preeti28dec/Youtube-Academy · Technical details: README.md, DATABASE.md, VERCEL.md
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
