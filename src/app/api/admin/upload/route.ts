@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { requireAdmin } from "@/lib/auth";
+import { IS_SERVERLESS } from "@/lib/video-source";
 
 export const runtime = "nodejs";
 
@@ -26,6 +27,20 @@ export async function POST(req: Request) {
     await requireAdmin();
   } catch {
     return NextResponse.json({ error: "Admin only" }, { status: 403 });
+  }
+
+  // Vercel jaise serverless par writable disk nahi hota — crash dene ke bajaye
+  // saaf batate hain ki kya karna hai.
+  if (IS_SERVERLESS) {
+    return NextResponse.json(
+      {
+        error:
+          "Is hosting par file upload nahi ho sakti (serverless par disk nahi hota). " +
+          "Video apne video host (Bunny / VdoCipher / S3) par upload karein aur " +
+          "uska URL lesson ke video field mein paste kar dein.",
+      },
+      { status: 501 },
+    );
   }
 
   const form = await req.formData().catch(() => null);

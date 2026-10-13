@@ -125,7 +125,7 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
                   <input
                     value={draft.videoKey}
                     onChange={(e) => setDraft({ ...draft, videoKey: e.target.value })}
-                    placeholder="video file / id"
+                    placeholder="Video URL ya file name"
                     className="h-10 w-40 rounded-[9px] border border-line-strong bg-surface px-3 text-sm font-medium"
                   />
                   <label className="flex items-center gap-1.5 text-[13px] font-medium text-body">
@@ -240,7 +240,7 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
           <input
             value={newLesson.videoKey}
             onChange={(e) => setNewLesson({ ...newLesson, videoKey: e.target.value })}
-            placeholder="Video file name / VdoCipher id"
+            placeholder="Video URL ya file name"
             className={inputCls}
           />
           <label className="flex cursor-pointer flex-col items-center gap-1.5 rounded-[10px] border-[1.5px] border-dashed border-line-strong bg-surface-muted p-4.5 text-center hover:border-brand">
@@ -250,6 +250,9 @@ export function AdminContent({ modules }: { modules: ModuleRow[] }) {
             </span>
             <span className="text-[11.5px] font-medium leading-snug text-muted">
               MP4 / WebM / MOV · max 500 MB
+            </span>
+            <span className="text-[11.5px] font-medium leading-snug text-muted">
+              Ya upar wale field mein seedha video ka URL paste kar dein
             </span>
             <input
               type="file"

@@ -1,8 +1,10 @@
 # Vercel par deploy
 
-> **Chhota jawab:** app Vercel par chal sakta hai, lekin **do cheezein pehle badalni
-> padengi** — database (SQLite nahi chalega) aur video hosting (disk par file nahi rakh sakte).
-> Bina inke deploy ya to build par rukega ya live site 500 degi.
+> **Chhota jawab:** app Vercel par chalta hai, lekin **do cheezein aapko deni padengi** —
+> ek Postgres database aur videos ke liye ek external host ka URL. SQLite aur disk par
+> rakhi files Vercel par kaam nahi karti (serverless par persistent disk hota hi nahi).
+> Code side ka kaam ho chuka hai: `vercel.json`, Postgres migrations, aur video URL
+> support repo mein hain.
 
 ---
 
@@ -11,8 +13,8 @@
 | Cheez | Local / Docker | Vercel |
 | --- | --- | --- |
 | **SQLite** (`file:./dev.db`) | chalta hai | **nahi** — Vercel ka filesystem read-only aur ephemeral hai. DB file na likh sakte hain, na bachegi. |
-| **Video upload** (`/api/admin/upload` → `media/`) | chalta hai | **nahi** — disk par likhna allowed nahi (sirf `/tmp`, jo har request ke baad gayab ho sakta hai). |
-| **Video streaming** (`/api/video/stream` disk se padhta hai) | chalta hai | **nahi** — file hi nahi hogi. |
+| **Video upload** (`/api/admin/upload` → `media/`) | chalta hai | **nahi** — disk par likhna allowed nahi. Route ab saaf 501 deta hai: video host par upload karke URL paste karein. |
+| **Video streaming** | disk se | **chalta hai** — lesson ke video field mein URL daalein, server use proxy kar deta hai (access check waisa hi). |
 | Baaki sab (pages, auth, payment, progress) | chalta hai | chalta hai |
 
 Yeh koi bug nahi hai — Vercel serverless hai, usme persistent disk hota hi nahi.
@@ -25,28 +27,21 @@ Local aur Docker setup disk use karta hai kyunki wahan disk hai.
 ### 1. PostgreSQL lagayein
 
 SQLite ki jagah managed Postgres. Free options: **Neon**, **Supabase**, ya Vercel ka apna
-Postgres (Storage tab se).
+Postgres (Storage tab → Create Database).
 
-```bash
-npm run db:use-postgres     # schema.prisma ka provider badal deta hai
-git add prisma/schema.prisma && git commit -m "Postgres par shift" && git push
-```
+Connection string copy karke agle step mein `DATABASE_URL` ki tarah daal dein. **Bas itna hi** —
+baaki repo mein pehle se taiyaar hai:
 
-Phir ek baar migration bana ke push karein:
+- `vercel.json` ka build command khud provider ko `postgresql` kar deta hai aur
+  `prisma migrate deploy` chalata hai:
+  ```
+  node scripts/switch-db.mjs postgresql && prisma generate && prisma migrate deploy && next build
+  ```
+- `prisma/migrations/0_init/` mein Postgres ka initial migration commit hai.
+- Repo ka `schema.prisma` `sqlite` par hi rehta hai, taaki `npm run dev` local par
+  bina kisi DB server ke chalta rahe.
 
-```bash
-# .env mein DATABASE_URL ko Postgres ka string kar dein, phir:
-npx prisma migrate dev --name init
-git add prisma/migrations && git commit -m "init migration" && git push
-```
-
-Aur Vercel ka build command badal dein (Settings → General → Build Command):
-
-```
-prisma generate && prisma migrate deploy && next build
-```
-
-> Local par wapas SQLite chahiye to `npm run db:use-sqlite`.
+> Local par bhi Postgres chahiye to: `npm run db:use-postgres` (wapas: `npm run db:use-sqlite`).
 
 ### 2. Environment variables (Settings → Environment Variables)
 
@@ -65,24 +60,29 @@ Env var add karne ke baad **redeploy** karna padta hai — purana build naye var
 
 ### 3. Videos external host par
 
-`src/app/api/video/token/route.ts` mein jahan abhi local stream URL banti hai, wahan
-VdoCipher/Bunny ka signed URL (ya OTP) return karwayein. Access-check wala poora code
-waisa hi rehta hai — sirf aakhri line badalti hai.
+Video apne host (Bunny, S3, R2, Cloudflare) par upload karein aur admin panel mein
+lesson ke **video field mein uska URL paste** kar dein. Bas itna hi — code change
+nahi chahiye.
 
-Admin upload ke liye: browser se seedha video host par upload karwayein aur DB mein
-sirf unka `videoKey` save karein. Tab badi files Vercel se guzregi hi nahi
-(Vercel par request body ki limit bhi hai).
+Server us URL ko proxy karta hai, isliye:
+
+- asli CDN URL browser tak kabhi nahi jaata,
+- signed 2-minute token aur enrollment check waise ke waise lagte hain,
+- Range (seeking) pass-through hota hai, poori file memory mein nahi aati.
+
+> **Aage ke liye:** sabse strong option VdoCipher / Bunny Stream ka OTP ya signed URL
+> `/api/video/token` se return karna hai — tab DRM aur domain lock bhi mil jaate hain
+> aur video hamare server se guzarti hi nahi.
 
 ---
 
 ## Deploy se pehle checklist
 
-- [ ] `npm run db:use-postgres` chalaya aur commit kiya
-- [ ] `prisma/migrations/` commit mein hai
-- [ ] Build command mein `prisma migrate deploy` hai
+- [ ] Postgres database bana liya aur uska connection string haath mein hai
 - [ ] Saare env vars Production + Preview dono par set hain
 - [ ] Env vars set karne ke **baad** redeploy kiya
 - [ ] Razorpay webhook URL `https://<domain>/api/payment/webhook` par point karta hai
+- [ ] Har lesson ke video field mein external URL hai (Vercel par local file nahi chalti)
 
 ---
 

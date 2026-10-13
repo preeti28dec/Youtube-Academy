@@ -1,0 +1,5 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "node scripts/switch-db.mjs postgresql && prisma generate && prisma migrate deploy && next build",
+  "framework": "nextjs"
+}

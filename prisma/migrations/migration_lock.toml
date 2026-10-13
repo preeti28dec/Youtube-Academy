@@ -1,0 +1,4 @@
+# Yeh migrations PostgreSQL ke liye hain (production / Vercel / Docker).
+# Local dev SQLite par `prisma db push` use karta hai, jo migrations ko
+# ignore karta hai — isliye dono saath chal jaate hain.
+provider = "postgresql"

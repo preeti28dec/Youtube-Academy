@@ -5,6 +5,7 @@ import { Readable } from "node:stream";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { verifyVideoToken } from "@/lib/video-token";
+import { parseVideoSource } from "@/lib/video-source";
 
 export const runtime = "nodejs";
 
@@ -20,20 +21,27 @@ const VIDEO_DIR = path.join(process.cwd(), "media");
 /**
  * Signed video stream.
  *
- * Yeh route local/self-hosted setup ke liye hai. Production mein isi jagah
- * VdoCipher ya Bunny Stream ka OTP/signed URL return hota hai (DATABASE.md
- * aur /guide page mein details) — tab video hamare server se guzarti hi nahi.
- *
  * Teen layer:
  *   1. token signature + expiry (2 min)
  *   2. token ka userId == current session user  -> link share karna bekaar
- *   3. file path sanitize -> videoKey se directory traversal possible nahi
+ *   3. source sanitize -> na directory traversal, na internal-network URL
+ *
+ * Source do tarah ka ho sakta hai (lib/video-source.ts dekhein): local file
+ * (self-hosted / Docker) ya external URL (Vercel aur CDN ke liye), jise yeh
+ * route proxy karta hai taaki asli URL kabhi browser tak na pahunche.
+ *
+ * Production ke liye sabse achha: VdoCipher / Bunny Stream ka OTP ya signed
+ * URL yahan se return karna — tab video hamare server se guzarti hi nahi aur
+ * DRM + domain lock bhi mil jaata hai.
  */
 export async function GET(req: Request) {
   const token = new URL(req.url).searchParams.get("token") ?? "";
   const payload = verifyVideoToken(token);
   if (!payload) {
-    return NextResponse.json({ error: "Link expire ho gaya. Page refresh karein." }, { status: 403 });
+    return NextResponse.json(
+      { error: "Link expire ho gaya. Page refresh karein." },
+      { status: 403 },
+    );
   }
 
   // Token kisi aur ko bheja gaya ho to yahan fail hota hai.
@@ -47,13 +55,42 @@ export async function GET(req: Request) {
     where: { id: payload.lessonId },
     select: { videoKey: true },
   });
-  if (!lesson?.videoKey) {
-    return NextResponse.json({ error: "Is lesson ki video abhi upload nahi hui." }, { status: 404 });
+
+  const source = parseVideoSource(lesson?.videoKey ?? null);
+  if (!source) {
+    return NextResponse.json(
+      { error: "Is lesson ki video abhi upload nahi hui." },
+      { status: 404 },
+    );
   }
 
-  // basename se "../" jaise jugaad kat jaate hain.
-  const safeName = path.basename(lesson.videoKey);
-  const filePath = path.join(VIDEO_DIR, safeName);
+  const range = req.headers.get("range");
+  return source.kind === "url"
+    ? streamFromUrl(source.url, range)
+    : streamFromDisk(source.name, range);
+}
+
+/** Har response par — browser aur CDN dono signed stream cache na karein. */
+function baseHeaders(): Headers {
+  return new Headers({
+    "Content-Type": "video/mp4",
+    "Accept-Ranges": "bytes",
+    "Cache-Control": "no-store, private",
+    // Browser ko "download" ke bajaye inline play karne ko kehte hain.
+    "Content-Disposition": "inline",
+  });
+}
+
+function rangeNotSatisfiable(size: number) {
+  return new NextResponse(null, {
+    status: 416,
+    headers: { "Content-Range": `bytes */${size}` },
+  });
+}
+
+/** Self-hosted / Docker: media/ folder se, HTTP Range ke saath taaki seek chale. */
+async function streamFromDisk(name: string, range: string | null) {
+  const filePath = path.join(VIDEO_DIR, name);
 
   let stat: fs.Stats;
   try {
@@ -62,39 +99,23 @@ export async function GET(req: Request) {
   } catch {
     return NextResponse.json(
       {
-        error: `Video file nahi mili: media/${safeName}. Koi bhi mp4 isi naam se rakh dein.`,
+        error: `Video file nahi mili: media/${name}. Koi bhi mp4 isi naam se rakh dein, ya admin panel se video ka URL daal dein.`,
       },
       { status: 404 },
     );
   }
 
-  const headers = new Headers({
-    "Content-Type": "video/mp4",
-    "Accept-Ranges": "bytes",
-    "Cache-Control": "no-store, private",
-    // Browser ko "download" ke bajaye inline play karne ko kehte hain.
-    "Content-Disposition": "inline",
-  });
+  const headers = baseHeaders();
 
-  // Seeking ke liye HTTP Range support — iske bina video scrub nahi hoti.
-  const range = req.headers.get("range");
   if (range) {
     const match = /^bytes=(\d*)-(\d*)$/.exec(range.trim());
-    if (!match) {
-      return new NextResponse(null, {
-        status: 416,
-        headers: { "Content-Range": `bytes */${stat.size}` },
-      });
-    }
+    if (!match) return rangeNotSatisfiable(stat.size);
 
     const start = match[1] ? Number(match[1]) : 0;
     const end = match[2] ? Math.min(Number(match[2]), stat.size - 1) : stat.size - 1;
 
     if (Number.isNaN(start) || Number.isNaN(end) || start > end || start >= stat.size) {
-      return new NextResponse(null, {
-        status: 416,
-        headers: { "Content-Range": `bytes */${stat.size}` },
-      });
+      return rangeNotSatisfiable(stat.size);
     }
 
     headers.set("Content-Range", `bytes ${start}-${end}/${stat.size}`);
@@ -106,4 +127,50 @@ export async function GET(req: Request) {
   headers.set("Content-Length", String(stat.size));
   const stream = fs.createReadStream(filePath);
   return new Response(Readable.toWeb(stream) as ReadableStream, { status: 200, headers });
+}
+
+/**
+ * Serverless / CDN: upstream se laakar aage bhejta hai.
+ *
+ * Range header waise ka waisa pass hota hai, isliye seeking chalti hai aur
+ * poori file memory mein nahi aati — body stream ki tarah pipe hoti hai.
+ * Asli URL browser tak kabhi nahi jaata.
+ */
+async function streamFromUrl(url: string, range: string | null) {
+  let upstream: Response;
+  try {
+    upstream = await fetch(url, {
+      headers: range ? { Range: range } : undefined,
+      cache: "no-store",
+      // Upstream kisi aur jagah bhej raha ho to aage na jaayein (SSRF guard).
+      redirect: "manual",
+    });
+  } catch {
+    return NextResponse.json(
+      { error: "Video host se connect nahi ho paaya. Thodi der baad try karein." },
+      { status: 502 },
+    );
+  }
+
+  if (upstream.status >= 300 && upstream.status < 400) {
+    return NextResponse.json(
+      { error: "Video host redirect kar raha hai. Admin panel mein seedha file ka URL daalein." },
+      { status: 502 },
+    );
+  }
+  if (!upstream.ok && upstream.status !== 206) {
+    return NextResponse.json(
+      { error: `Video host ne ${upstream.status} diya.` },
+      { status: 502 },
+    );
+  }
+
+  const headers = baseHeaders();
+  // Upstream ki length/range/type aage bhej dein, taaki player seek kar sake.
+  for (const h of ["content-length", "content-range", "content-type"]) {
+    const v = upstream.headers.get(h);
+    if (v) headers.set(h, v);
+  }
+
+  return new Response(upstream.body, { status: upstream.status, headers });
 }
