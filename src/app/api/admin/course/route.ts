@@ -48,3 +48,44 @@ export async function PATCH(req: Request) {
   await prisma.course.update({ where: { slug: COURSE_SLUG }, data });
   return NextResponse.json({ ok: true });
 }
+
+/**
+ * Poora course tree — ids ke saath.
+ *
+ * Admin UI ko iski zaroorat nahi (woh server component se data leta hai),
+ * lekin content ko script se theek karne ke liye ids chahiye hote hain —
+ * jaise jab saara text ek saath badalna ho.
+ */
+export async function GET() {
+  try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Admin only" }, { status: 403 });
+  }
+
+  const course = await prisma.course.findUnique({
+    where: { slug: COURSE_SLUG },
+    select: {
+      id: true,
+      title: true,
+      subtitle: true,
+      description: true,
+      pricePaise: true,
+      modules: {
+        orderBy: { position: "asc" },
+        select: {
+          id: true,
+          title: true,
+          position: true,
+          lessons: {
+            orderBy: { position: "asc" },
+            select: { id: true, title: true, duration: true, isFree: true, position: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!course) return NextResponse.json({ error: "Course not found" }, { status: 404 });
+  return NextResponse.json(course);
+}
