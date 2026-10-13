@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { dbConfigured } from "@/lib/db-url";
+import { secretsConfigured } from "@/lib/env";
 
 /**
  * Database configure na ho to har request /setup par chali jaati hai.
@@ -9,7 +10,7 @@ import { dbConfigured } from "@/lib/db-url";
  * hi yeh middleware kuch nahi karta aur site normal chalne lagti hai.
  */
 export function middleware(req: NextRequest) {
-  if (dbConfigured()) return NextResponse.next();
+  if (dbConfigured() && secretsConfigured()) return NextResponse.next();
 
   // Setup page khud DB use nahi karta, isliye use rewrite se bahar rakhte hain.
   if (req.nextUrl.pathname === "/setup") return NextResponse.next();
@@ -17,7 +18,7 @@ export function middleware(req: NextRequest) {
   // API calls ko HTML page bhejna bekaar hai — unhe saaf JSON milta hai.
   if (req.nextUrl.pathname.startsWith("/api/")) {
     return NextResponse.json(
-      { error: "Server par database configure nahi hai. /setup dekhein." },
+      { error: "Server abhi poori tarah configure nahi hai. /setup dekhein." },
       { status: 503 },
     );
   }

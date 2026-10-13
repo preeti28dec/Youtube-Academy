@@ -7,7 +7,11 @@ import { dbConfigured } from "./db-url";
 
 const COOKIE = "sya_session";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 din
-const secret = new TextEncoder().encode(env.authSecret);
+// Lazy — import par nahi. Production mein AUTH_SECRET na ho to env.authSecret
+// throw karta hai; agar yeh module-level hota to setup page bhi 500 de deta.
+function secretKey(): Uint8Array {
+  return new TextEncoder().encode(env.authSecret);
+}
 
 export type SessionUser = {
   id: string;
@@ -31,7 +35,7 @@ export async function createSession(user: SessionUser): Promise<void> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${MAX_AGE}s`)
-    .sign(secret);
+    .sign(secretKey());
 
   (await cookies()).set(COOKIE, token, {
     httpOnly: true,
@@ -55,7 +59,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, secretKey());
     const uid = payload.uid;
     if (typeof uid !== "string") return null;
     const user = await prisma.user.findUnique({

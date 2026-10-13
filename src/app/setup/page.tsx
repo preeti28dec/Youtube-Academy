@@ -1,4 +1,5 @@
 import { dbConfigProblem, describeDbUrl, resolveDbUrl } from "@/lib/db-url";
+import { secretsConfigured } from "@/lib/env";
 import { CheckIcon } from "@/components/icons";
 
 export const metadata = { title: "Setup zaroori hai · Sohail YouTube Academy" };
@@ -32,6 +33,7 @@ const ENV_VARS = [
 export default function SetupPage() {
   const problem = dbConfigProblem();
   const resolved = resolveDbUrl();
+  const secretsOk = secretsConfigured();
 
   return (
     <div className="mx-auto w-full max-w-[720px] px-5 pt-12 pb-20">
@@ -41,7 +43,9 @@ export default function SetupPage() {
             Setup
           </span>
           <h1 className="text-[clamp(24px,4vw,30px)] font-extrabold leading-tight tracking-[-0.02em] text-ink">
-            Site deploy ho gayi — ab database jodna baaki hai
+            {problem
+              ? "Site deploy ho gayi — ab database jodna baaki hai"
+              : "Database jud gaya — bas do secrets baaki hain"}
           </h1>
           <p className="text-[15px] leading-relaxed text-body">
             Code bilkul theek hai. Bas hosting par kuch environment variables set karne hain,
@@ -54,9 +58,11 @@ export default function SetupPage() {
           <span className="text-[13.5px] font-semibold text-danger">
             {problem === "missing"
               ? "DATABASE_URL set nahi hai."
-              : `${resolved?.from ?? "DATABASE_URL"} postgres ka URL nahi lag raha — abhi uski shuruaat hai ${describeDbUrl(
-                  resolved ? process.env[resolved.from] : undefined,
-                )}`}
+              : problem === "bad-protocol"
+                ? `${resolved?.from ?? "DATABASE_URL"} postgres ka URL nahi lag raha — abhi uski shuruaat hai ${describeDbUrl(
+                    resolved ? process.env[resolved.from] : undefined,
+                  )}`
+                : "Database jud gaya hai. Ab AUTH_SECRET aur VIDEO_TOKEN_SECRET baaki hain — inke bina session aur video token surakshit nahi rehte."}
           </span>
           {problem === "bad-protocol" && (
             <p className="mt-1.5 text-[13px] leading-relaxed text-body">
@@ -71,7 +77,9 @@ export default function SetupPage() {
           {[
             "Vercel dashboard > aapka project > Storage tab > Create Database > Neon (Postgres) chunein.",
             "Project se connect karein — DATABASE_URL apne aap add ho jaata hai.",
-            "Settings > Environment Variables mein neeche di gayi baaki vars daalein (Production aur Preview dono).",
+            secretsOk
+              ? "Settings > Environment Variables mein baaki vars (jo neeche bina tick ke hain) daalein."
+              : "Settings > Environment Variables mein AUTH_SECRET aur VIDEO_TOKEN_SECRET daalein (Production aur Preview dono).",
             "Deployments > latest > Redeploy. Env var add karne se purana build apne aap dobara nahi banta.",
           ].map((step, i) => (
             <li key={i} className="flex items-start gap-3">

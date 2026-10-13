@@ -131,9 +131,33 @@ function describe(raw) {
 // DB jud gaya ho to migrations zaroori hain — yahan fail hona chahiye, warna
 // site bin-tables ke deploy ho jayegi aur har page 500 dega.
 if (dbReady) {
+  // Neon/Supabase ka default URL connection POOLER (pgbouncer) se jaata hai.
+  // App ke liye wahi sahi hai (serverless mein bahut saare short connections),
+  // lekin migrations pooler par atak sakti hain — Prisma advisory lock leta hai
+  // jo transaction-mode pooler support nahi karta. Isliye migration ke liye
+  // seedha (unpooled) connection pasand karte hain, agar mil jaaye.
+  const DIRECT = ["DIRECT_URL", "DATABASE_URL_UNPOOLED", "POSTGRES_URL_NON_POOLING"];
+  const pooled = process.env.DATABASE_URL;
+
+  for (const name of DIRECT) {
+    const direct = (process.env[name] ?? "")
+      .trim()
+      .replace(/^["']+/, "")
+      .replace(/["']+$/, "")
+      .trim();
+    if (direct && /^postgres(ql)?:\/\//.test(direct)) {
+      process.env.DATABASE_URL = direct;
+      console.log(`[build] migrations ke liye seedha connection: ${name}`);
+      break;
+    }
+  }
+
   const { code, out } = run("prisma migrate deploy", "npx", ["prisma", "migrate", "deploy"], {
     capture: true,
   });
+
+  // App ko wapas pooled URL milna chahiye.
+  if (pooled) process.env.DATABASE_URL = pooled;
 
   if (code !== 0) {
     // P3005: DB mein tables pehle se hain lekin migration history nahi
